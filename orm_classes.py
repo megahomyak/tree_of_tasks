@@ -15,4 +15,4 @@ class Task(DeclarativeBase):
     nested_tasks_is_shown = Column(Boolean)
     parent_task_id = Column(Integer, ForeignKey("tasks.id"))
 
-    nested_tasks = relationship("Task")
+    nested_tasks = relationship("Task", cascade="save-update, delete")
