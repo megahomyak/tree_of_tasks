@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 import sqlalchemy.orm
 from sqlalchemy import create_engine
@@ -32,3 +32,11 @@ class TasksManager:
     def delete(self, *tasks: orm_classes.Task) -> None:
         for task in tasks:
             self.db_session.delete(task)
+
+    def get_filtered_tasks(self, *filters: Any) -> List[orm_classes.Task]:
+        return (
+            self.db_session
+            .query(orm_classes.Task)
+            .filter_by(*filters)
+            .all()
+        )
