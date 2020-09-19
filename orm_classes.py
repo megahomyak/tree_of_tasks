@@ -18,4 +18,9 @@ class Task(DeclarativeBase):
     parent_task_id = Column(Integer, ForeignKey("tasks.id"))
     creation_date = Column(DateTime, default=datetime.now())
 
-    nested_tasks = relationship("Task", cascade="save-update, delete")
+    nested_task = relationship("Task", cascade="save-update, delete")
+
+    def set_is_checked_recursively(self, state: bool) -> None:
+        for task in self.nested_tasks:
+            task.set_is_checked_to(state)
+        self.is_checked = state
