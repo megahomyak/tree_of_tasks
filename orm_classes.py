@@ -27,9 +27,6 @@ class Task(DeclarativeBase):
 
         Args:
             state: state of the current task and nested tasks
-
-        Returns:
-            None
         """
         for task in self.nested_tasks:
             task.set_is_checked_to(state)
