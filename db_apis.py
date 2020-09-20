@@ -41,3 +41,14 @@ class TasksManager:
             .filter(*filters)
             .all()
         )
+
+    def get_root_tasks(self) -> List[orm_classes.Task]:
+        """
+        Gets all tasks, which have no parent task, aka root tasks.
+        """
+        return (
+            self.db_session
+            .query(orm_classes.Task)
+            .filter(orm_classes.Task.parent_task_id is None)
+            .all()
+        )
