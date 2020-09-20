@@ -45,6 +45,9 @@ class TasksManager:
     def get_root_tasks(self) -> List[orm_classes.Task]:
         """
         Gets all tasks, which have no parent task, aka root tasks.
+
+        Returns: List of Tasks, which is orm classes' objects, so you can
+        change them and then commit changes to the database.
         """
         return (
             self.db_session
