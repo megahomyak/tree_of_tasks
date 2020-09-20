@@ -38,6 +38,6 @@ class TasksManager:
         return (
             self.db_session
             .query(orm_classes.Task)
-            .filter_by(*filters)
+            .filter(*filters)
             .all()
         )
