@@ -21,6 +21,7 @@ class TasksManager:
         return (
             self.db_session
             .query(orm_classes.Task)
+            .order_by(orm_classes.Task.creation_date)
             .all()
         )
 
@@ -39,6 +40,7 @@ class TasksManager:
             self.db_session
             .query(orm_classes.Task)
             .filter(*filters)
+            .order_by(orm_classes.Task.creation_date)
             .all()
         )
 
@@ -53,5 +55,6 @@ class TasksManager:
             self.db_session
             .query(orm_classes.Task)
             .filter(orm_classes.Task.parent_task_id is None)
+            .order_by(orm_classes.Task.creation_date)
             .all()
         )
