@@ -36,6 +36,18 @@ class TasksManager:
             self.db_session.delete(task)
 
     def get_filtered_tasks(self, *filters: Any) -> List[orm_classes.Task]:
+        """
+        Gets tasks, which passed the filter(s).
+
+        Filters are comparison of a Column and some value, also you can use
+        OR or AND operators with corresponding construction.
+
+        Args:
+            *filters: comparison of a Column object of class Task and some value
+
+        Returns: List of orm classes Task, which are tasks, that passed the
+        filters.
+        """
         return (
             self.db_session
             .query(orm_classes.Task)
