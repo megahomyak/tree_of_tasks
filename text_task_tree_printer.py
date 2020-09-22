@@ -10,7 +10,7 @@ class TextTaskTreePrinter:
             root_tasks: List[orm_classes.Task],
             indentation_level: int = 0,
             indent_size: int = 4
-    ):
+    ) -> None:
         for task in root_tasks:
             print(
                 f"{' ' * (indentation_level * indent_size)}"
