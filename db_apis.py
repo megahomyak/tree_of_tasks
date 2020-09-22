@@ -70,3 +70,20 @@ class TasksManager:
             .order_by(orm_classes.Task.creation_date)
             .all()
         )
+
+    def check_existence(self, *filters: Any) -> bool:
+        """
+        Checks if the specified tasks exist in the database.
+
+        Args:
+            *filters: comparison of a Column object of class Task and some value
+
+        Returns:
+            True if any matching task found, else False
+        """
+        return (
+            self.db_session
+            .query(orm_classes.Task)
+            .filter(filters)
+            .exists()
+        )
