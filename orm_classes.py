@@ -12,10 +12,10 @@ class Task(DeclarativeBase):
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True)
-    text = Column(String)
-    is_checked = Column(Boolean)
-    nested_tasks_is_shown = Column(Boolean)
-    parent_task_id = Column(Integer, ForeignKey("tasks.id"))
+    text = Column(String, default="")
+    is_checked = Column(Boolean, default=False)
+    nested_tasks_is_shown = Column(Boolean, default=True)
+    parent_task_id = Column(Integer, ForeignKey("tasks.id"), default=None)
     creation_date = Column(DateTime, default=datetime.now())
 
     nested_tasks = relationship("Task", cascade="save-update, delete")
