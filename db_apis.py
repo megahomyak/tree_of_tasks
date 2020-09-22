@@ -73,7 +73,8 @@ class TasksManager:
 
     def check_existence(self, *filters: Any) -> bool:
         """
-        Checks if the tasks with the specified parameters exist in the database.
+        Checks if at least one task with the specified parameters exists in the
+        database.
 
         Args:
             *filters: comparison of a Column object of class Task and some value
