@@ -85,5 +85,5 @@ class TasksManager:
             self.db_session
             .query(orm_classes.Task)
             .filter(filters)
-            .exists()
-        )
+            .first()
+        ) is not None
