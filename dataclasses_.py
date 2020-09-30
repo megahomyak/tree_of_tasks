@@ -113,5 +113,5 @@ class Arg:
 class Command:
 
     name: str
-    fields: Tuple[BaseArgType]
     description: str
+    arguments: Tuple[Arg] = ()
