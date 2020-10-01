@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Tuple, Any
+from typing import Tuple, Any, Callable
 
 
 class BaseArgType(ABC):
@@ -114,4 +114,5 @@ class Command:
 
     name: str
     description: str
+    attached_function: Callable
     arguments: Tuple[Arg] = ()
