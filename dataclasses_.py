@@ -44,7 +44,9 @@ class IntArgType(BaseArgType):
 
     @property
     def regex(self) -> str:
-        return r"-?\d"
+        if self.is_signed:
+            return r"-?\d+"
+        return r"\d+"
 
     def __init__(self, is_signed: bool = True):
         self.is_signed = is_signed
