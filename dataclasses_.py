@@ -125,7 +125,7 @@ class Arg:
 @dataclass
 class Command:
 
-    name: str
+    names: Tuple[str]
     description: str
     attached_function: Callable
     arguments: Tuple[Arg] = ()
@@ -134,7 +134,8 @@ class Command:
         rgx_result = re.fullmatch(
             pattern=" ".join(
                 [
-                    self.name, *[
+                    f"(?:{'|'.join(self.names)})",
+                    *[
                         f"({arg.type.regex})"
                         for arg in self.arguments
                     ]
@@ -176,10 +177,19 @@ class Command:
                 for argument in self.arguments
             )
         if include_heading:
-            return (
-                f"Описание команды {self.name}:\n"
-                f"{self.description}\n\n"
-                "Аргументы:\n"
-                f"{args_description}"
-            )
+            if len(self.names) > 1:
+                return (
+                    f"Описание команды {self.names[0]}:\n"
+                    f"{self.description}\n\n"
+                    f"Псевдонимы:\n{''.join(self.names[1:])}\n\n"
+                    "Аргументы:\n"
+                    f"{args_description}"
+                )
+            else:
+                return (
+                    f"Описание команды {self.names[0]}:\n"
+                    f"{self.description}\n\n"
+                    "Аргументы:\n"
+                    f"{args_description}"
+                )
         return args_description
