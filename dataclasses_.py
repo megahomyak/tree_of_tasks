@@ -1,6 +1,9 @@
+import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Tuple, Any, Callable
+
+import exceptions
 
 
 class BaseArgType(ABC):
@@ -118,3 +121,31 @@ class Command:
     description: str
     attached_function: Callable
     arguments: Tuple[Arg] = ()
+
+    def convert_command_to_args(self, command: str) -> Tuple[Any]:
+        rgx_result = re.fullmatch(
+            pattern=" ".join(
+                [
+                    self.name, *[
+                        f"({arg.type.regex})"
+                        for arg in self.arguments
+                    ]
+                ]  # Something like (\d\d)
+            ),
+            string=command
+        )
+        if rgx_result is None:
+            raise exceptions.ParsingError
+        # noinspection PyArgumentList
+        # because IDK why it thinks that `arg` argument is already filled
+        # (like `self`)
+        return tuple(
+            converter(group)
+            for group, converter in zip(
+                rgx_result.groups(),
+                [
+                    arg.type.convert
+                    for arg in self.arguments
+                ]
+            )
+        )
