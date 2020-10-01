@@ -157,3 +157,29 @@ class Command:
                 ]
             )
         )
+
+    @property
+    def description(
+            self, include_type_descriptions: bool = False,
+            include_heading: bool = False) -> str:
+        if include_type_descriptions:
+            args_description = "\n".join(
+                f"{argument.name}"
+                f" ({argument.type.name} - {argument.type.description})"
+                f" - {argument.description}"
+                for argument in self.arguments
+            )
+        else:
+            args_description = "\n".join(
+                f"{argument.name} ({argument.type.name})"
+                f" - {argument.description}"
+                for argument in self.arguments
+            )
+        if include_heading:
+            return (
+                f"Описание команды {self.name}:\n"
+                f"{self.description}\n\n"
+                "Аргументы:\n"
+                f"{args_description}"
+            )
+        return args_description
