@@ -52,7 +52,7 @@ class MainLogic:
             self.tasks_manager.get_root_tasks()
         )
 
-    def get_commands_infinitely(self) -> NoReturn:
+    def listen_for_commands_infinitely(self) -> NoReturn:
         while True:
             entered_command = input(">>> ")
             for command in self.commands:
