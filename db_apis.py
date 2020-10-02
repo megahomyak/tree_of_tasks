@@ -88,3 +88,22 @@ class TasksManager:
             .filter(filters)
             .first()
         ) is not None
+
+    def get_task_by_id(self, task_id: int) -> orm_classes.Task:
+        """
+        Gets task by id, if no tasks are found - raises an exception.
+
+        Returns:
+            found task
+
+        Raises:
+            sqlalchemy.orm.exc.NoResultFound or
+            sqlalchemy.orm.exc.MultipleResultsFound
+        """
+        return (
+            self.db_session
+            .query(orm_classes.Task)
+            .filter_by(id=task_id)
+            .order_by(orm_classes.Task.creation_date)
+            .one()
+        )
