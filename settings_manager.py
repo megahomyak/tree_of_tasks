@@ -4,8 +4,10 @@ from typing import Optional, Any, Tuple
 
 class SettingsManager:
 
-    def __init__(self, filepath: str, default_section: str = "DEFAULT") -> None:
-        self.config_parser = ConfigParser()
+    def __init__(
+            self, config_parser: ConfigParser,
+            filepath: str, default_section: str = "DEFAULT") -> None:
+        self.config_parser = config_parser
         self.file_path = filepath
         self.default_section = default_section
 
