@@ -30,12 +30,12 @@ class INIWorker:
         Args:
             sections_with_fields: dict like {section_name: {field: value}}
         """
-        for section in sections_with_fields:
-            if section not in self.config_parser:
-                self.config_parser[section] = {}
-            for key, value in section:
-                if key not in self.config_parser[section]:
-                    self[section, key] = value
+        for section_name, section_contents in sections_with_fields.items():
+            if section_name not in self.config_parser:
+                self.config_parser[section_name] = {}
+            for key, value in section_contents.items():
+                if key not in self.config_parser[section_name]:
+                    self[section_name, key] = value
 
     def save(self, file_path: Optional[str] = None) -> None:
         """
