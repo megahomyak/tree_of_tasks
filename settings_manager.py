@@ -4,9 +4,10 @@ from typing import Optional, Any, Tuple
 
 class SettingsManager:
 
-    def __init__(self, filepath: str) -> None:
+    def __init__(self, filepath: str, default_section: str = "DEFAULT") -> None:
         self.config_parser = ConfigParser()
         self.file_path = filepath
+        self.default_section = default_section
 
     def load(self, file_path: Optional[str] = None) -> None:
         if file_path is None:
@@ -92,14 +93,23 @@ class SettingsManager:
         """
         return self.config_parser[section][name]
 
-    def __setitem__(self, section_and_key: Tuple[str, str], value: Any) -> None:
+    def __setitem__(
+            self, section_and_key: Optional[Tuple[str, str], str],
+            value: Any) -> None:
         """
         Sets the value with the specified name to the specified section.
         VALUE WILL BE CONVERTED TO STRING!
 
         Args:
-            section_and_key: tuple of two strings - section name and key
+            section_and_key:
+                tuple of two strings - section name and key
+                OR
+                key, then section is self.default_section
             value: you know what this is. Will be converted to string
         """
-        section, name = section_and_key
+        if isinstance(section_and_key, str):
+            section = self.default_section
+            name = section_and_key
+        else:
+            section, name = section_and_key
         self.config_parser[section][name] = str(value)
