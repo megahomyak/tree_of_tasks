@@ -150,7 +150,7 @@ class Arg:
 
     name: str
     type: BaseArgType
-    description: str
+    description: str = "<описание отсутствует>"
 
 
 @dataclass
