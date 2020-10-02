@@ -9,7 +9,7 @@ from text_task_tree_printer import TextTaskTreePrinter
 from types_converter import TypesConverter
 
 
-class MainLogicWithoutGui:
+class MainLogic:
 
     def __init__(
             self, tasks_manager: db_apis.TasksManager,
