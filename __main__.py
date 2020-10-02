@@ -58,7 +58,7 @@ class MainLogic:
             for command in self.commands:
                 try:
                     command.attached_function(
-                        command.convert_command_to_args(entered_command)
+                        *command.convert_command_to_args(entered_command)
                     )
                 except exceptions.ParsingError:
                     pass
