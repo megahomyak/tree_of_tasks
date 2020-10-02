@@ -5,7 +5,7 @@ import orm_classes
 
 class TextTaskTreePrinter:
 
-    def print_tasks(
+    def print_tasks_recursively(
             self,
             root_tasks: List[orm_classes.Task],
             indentation_level: int = 0,
@@ -20,7 +20,7 @@ class TextTaskTreePrinter:
                 f" {task.text}"
             )
             if task.nested_tasks_is_shown:
-                self.print_tasks(
+                self.print_tasks_recursively(
                     task.nested_tasks,
                     indentation_level + 1,
                     indent_size
