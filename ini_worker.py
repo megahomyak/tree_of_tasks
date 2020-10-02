@@ -1,5 +1,5 @@
 from configparser import ConfigParser, SectionProxy
-from typing import Optional, Any, Tuple, Dict
+from typing import Optional, Any, Tuple, Dict, Union
 
 
 class INIWorker:
@@ -111,7 +111,7 @@ class INIWorker:
         return self.config_parser[section][name]
 
     def __setitem__(
-            self, section_and_key: Optional[Tuple[str, str], str],
+            self, section_and_key: Union[Tuple[str, str], str],
             value: Any) -> None:
         """
         Sets the value with the specified name to the specified section.
