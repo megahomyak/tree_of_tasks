@@ -163,12 +163,12 @@ class Command:
             self, include_type_descriptions: bool = False,
             include_heading: bool = False) -> str:
         heading_str = (
-            f"Описание команды {self.names[0]}:\n"
+            f"Описание команды '{self.names[0]}': "
             f"{self.description}\n"
-            f"Псевдонимы:\n"
-            f"{''.join(self.names[1:])}"
+            f"Псевдонимы: "
+            f"{', '.join(self.names[1:])}"
             if len(self.names) > 1 else
-            f"Описание команды {self.names[0]}:\n"
+            f"Описание команды '{self.names[0]}': "
             f"{self.description}"
         ) if include_heading else None
         args = list(
