@@ -1,5 +1,5 @@
-from configparser import ConfigParser
-from typing import Optional, Any, Tuple
+from configparser import ConfigParser, SectionProxy
+from typing import Optional, Any, Tuple, Dict
 
 
 class INIWorker:
@@ -19,10 +19,11 @@ class INIWorker:
     def load_from_string(self, string: str) -> None:
         self.config_parser.read_string(string)
 
-    def load_from_dict(self, dict_: dict) -> None:
+    def load_from_dict(self, dict_: Dict[str, Dict[str, Any]]) -> None:
         self.config_parser.read_dict(dict_)
 
-    def load_fields_if_not_exists(self, sections_with_fields: dict) -> None:
+    def load_fields_if_not_exists(
+            self, sections_with_fields: Dict[str, Dict[str, str]]) -> None:
         """
         If some field does not exist - create it with the given value.
 
@@ -129,3 +130,16 @@ class INIWorker:
         else:
             section, name = section_and_key
         self.config_parser[section][name] = str(value)
+
+    def get_section(
+            self, name: str, none_on_error: bool = False
+            ) -> Optional[SectionProxy]:
+        if none_on_error:
+            try:
+                return self.config_parser[name]
+            except KeyError:
+                return None
+        return self.config_parser[name]
+
+    def set_section(self, name: str, value: Dict[str, str]) -> None:
+        self.config_parser[name] = value
