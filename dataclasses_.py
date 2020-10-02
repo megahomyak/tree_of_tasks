@@ -159,8 +159,7 @@ class Command:
             )
         )
 
-    @property
-    def description(
+    def get_full_description(
             self, include_type_descriptions: bool = False,
             include_heading: bool = False) -> str:
         if include_type_descriptions:
