@@ -58,6 +58,37 @@ class IntArgType(BaseArgType):
         return int(arg)
 
 
+class OptionalIntArgType(BaseArgType):
+
+    @property
+    def name(self) -> str:
+        if self.is_signed:
+            return "целое необязательное число"
+        return r"неотрицательное целое необязательное число"
+
+    @property
+    def description(self) -> str:
+        return (
+            "число, вместо которого можно написать -, тогда при приведении "
+            "строки к числу с помощью метода convert вернется None"
+        )
+
+    @property
+    def regex(self) -> str:
+        if self.is_signed:
+            # There's a T-like ligature instead of |-,
+            # it doesn't looks as intended... :(
+            # But I like ligatures, I don't want to turn them off
+            return r"(?:-?\d+|-)"
+        return r"(?:\d+|-)"
+
+    def __init__(self, is_signed: bool = True) -> None:
+        self.is_signed = is_signed
+
+    def convert(self, arg: str) -> Any:
+        return int(arg) if arg != "-" else None
+
+
 class StringArgType(BaseArgType):
 
     @property
