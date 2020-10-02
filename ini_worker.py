@@ -22,6 +22,20 @@ class INIWorker:
     def load_from_dict(self, dict_: dict) -> None:
         self.config_parser.read_dict(dict_)
 
+    def load_fields_if_not_exists(self, sections_with_fields: dict) -> None:
+        """
+        If some field does not exist - create it with the given value.
+
+        Args:
+            sections_with_fields: dict like {section_name: {field: value}}
+        """
+        for section in sections_with_fields:
+            if section not in self:
+                self.config_parser[section] = {}
+            for key, value in section:
+                if key not in self.config_parser[section]:
+                    self[section, key] = value
+
     def save(self, file_path: Optional[str] = None) -> None:
         """
         Saves the current state of config parser to the file with the specified
