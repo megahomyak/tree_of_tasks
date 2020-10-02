@@ -27,7 +27,20 @@ class MainLogicWithoutGui:
                 "переключает показ дерева задач после каждого изменения",
                 self.switch_auto_showing
             ),
+            dataclasses_.Command(
+                ("помощь", "команды"),
+                "показывает список команд",
+                self.show_help_message
+            )
         )
+
+    def show_help_message(self) -> None:
+        print("\n\n".join(
+            [
+                command.get_full_description()
+                for command in self.commands
+            ]
+        ))
 
     def switch_auto_showing(self) -> None:
         self.settings["auto_showing"] = str(
