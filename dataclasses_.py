@@ -1,7 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Tuple, Any, Callable
+from typing import Tuple, Any, Callable, Union
 
 import exceptions
 
@@ -51,7 +51,7 @@ class IntArgType(BaseArgType):
             return r"-?\d+"
         return r"\d+"
 
-    def __init__(self, is_signed: bool = True):
+    def __init__(self, is_signed: bool = True) -> None:
         self.is_signed = is_signed
 
     def convert(self, arg: str) -> int:
@@ -85,7 +85,7 @@ class OptionalIntArgType(BaseArgType):
     def __init__(self, is_signed: bool = True) -> None:
         self.is_signed = is_signed
 
-    def convert(self, arg: str) -> Any:
+    def convert(self, arg: str) -> Union[None, int]:
         return int(arg) if arg != "-" else None
 
 
@@ -103,7 +103,7 @@ class StringArgType(BaseArgType):
             return r".+?"
         return fr"(?:.+?){{1,{self.length_limit}}}"
 
-    def __init__(self, length_limit: int = None):
+    def __init__(self, length_limit: int = None) -> None:
         self.length_limit = length_limit
 
     def convert(self, arg: str) -> str:
@@ -120,7 +120,7 @@ class BoolArgType(BaseArgType):
             false_values: Tuple[str, ...] = (
                 "нет", "no", "н", "n", "0", "-", "ложь", "false", "True"
             )
-    ):
+    ) -> None:
         self.true_values = true_values
         self.false_values = false_values
 
@@ -139,7 +139,7 @@ class BoolArgType(BaseArgType):
     def regex(self) -> str:
         return "|".join(self.true_values + self.false_values)
 
-    def convert(self, arg: str) -> Any:
+    def convert(self, arg: str) -> bool:
         if arg.lower() in self.true_values:
             return True
         return False
