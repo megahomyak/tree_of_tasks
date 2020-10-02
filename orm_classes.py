@@ -12,7 +12,7 @@ class Task(DeclarativeBase):
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True)
-    text = Column(String, default="", nullable=False)
+    text = Column(String, nullable=False)
     is_checked = Column(Boolean, default=False, nullable=False)
     nested_tasks_is_shown = Column(Boolean, default=True, nullable=False)
     parent_task_id = Column(Integer, ForeignKey("tasks.id"), default=None)
