@@ -50,4 +50,6 @@ class MainLogicWithoutGui:
                 except exceptions.ParsingError:
                     pass
                 else:
-                    continue
+                    break
+            else:
+                print("Что?")
