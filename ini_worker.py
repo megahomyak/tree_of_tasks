@@ -31,7 +31,7 @@ class INIWorker:
             sections_with_fields: dict like {section_name: {field: value}}
         """
         for section in sections_with_fields:
-            if section not in self:
+            if section not in self.config_parser:
                 self.config_parser[section] = {}
             for key, value in section:
                 if key not in self.config_parser[section]:
