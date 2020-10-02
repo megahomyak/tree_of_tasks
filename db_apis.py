@@ -17,6 +17,13 @@ class TasksManager:
     def __init__(self, db_session: sqlalchemy.orm.Session) -> None:
         self.db_session = db_session
 
+    def _get_query(self) -> sqlalchemy.orm.Query:
+        return (
+            self.db_session
+            .query(orm_classes.Task)
+            .order_by(orm_classes.Task.creation_date)
+        )
+
     def get_tasks(self) -> List[orm_classes.Task]:
         return (
             self.db_session
@@ -49,10 +56,8 @@ class TasksManager:
         filters.
         """
         return (
-            self.db_session
-            .query(orm_classes.Task)
+            self._get_query()
             .filter(*filters)
-            .order_by(orm_classes.Task.creation_date)
             .all()
         )
 
@@ -64,10 +69,8 @@ class TasksManager:
         change them and then commit changes to the database.
         """
         return (
-            self.db_session
-            .query(orm_classes.Task)
+            self._get_query()
             .filter(orm_classes.Task.parent_task_id is None)
-            .order_by(orm_classes.Task.creation_date)
             .all()
         )
 
@@ -83,6 +86,8 @@ class TasksManager:
             True if any matching task found, else False
         """
         return (
+            # I'm not using _get_query here, because it sorts the tasks by
+            # creation date
             self.db_session
             .query(orm_classes.Task)
             .filter(filters)
@@ -101,9 +106,7 @@ class TasksManager:
             sqlalchemy.orm.exc.MultipleResultsFound
         """
         return (
-            self.db_session
-            .query(orm_classes.Task)
+            self._get_query()
             .filter_by(id=task_id)
-            .order_by(orm_classes.Task.creation_date)
             .one()
         )
