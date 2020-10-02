@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from typing import NoReturn
 
 import dataclasses_
@@ -5,7 +6,7 @@ import db_apis
 import exceptions
 from default_fields_for_settings_file import DEFAULT_FIELDS_FOR_SETTINGS
 from ini_worker import INIWorker
-from text_task_tree_printer import TextTaskTreePrinter
+from text_task_tree_printer import TextTaskTreePrinter as TasksPrinter
 from types_converter import TypesConverter
 
 
@@ -13,7 +14,7 @@ class MainLogic:
 
     def __init__(
             self, tasks_manager: db_apis.TasksManager,
-            tasks_printer: TextTaskTreePrinter,
+            tasks_printer: TasksPrinter,
             ini_worker: INIWorker,
             types_converter: TypesConverter) -> None:
         self.tasks_manager = tasks_manager
@@ -66,3 +67,18 @@ class MainLogic:
                     break
             else:
                 print("Что?")
+
+
+if __name__ == '__main__':
+    main_logic = MainLogic(
+        db_apis.TasksManager(
+            db_apis.get_sqlalchemy_db_session("sqlite:///tree_of_tasks.db")
+        ),
+        TasksPrinter(),
+        INIWorker(
+            ConfigParser(),
+            "tree_of_tasks_config.ini"
+        ),
+        TypesConverter()
+    )
+    main_logic.listen_for_commands_infinitely()
