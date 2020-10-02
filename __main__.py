@@ -44,9 +44,14 @@ class MainLogic:
         ))
 
     def switch_auto_showing(self) -> None:
-        self.settings["auto_showing"] = str(
-            not self.types_converter.str_to_bool(self.settings["auto_showing"])
+        is_auto_showing_enabled = self.types_converter.str_to_bool(
+            self.settings["auto_showing"]
         )
+        print(
+            "Автопоказ дерева задач после каждой команды теперь "
+            f"{'включен' if not is_auto_showing_enabled else 'выключен'}"
+        )
+        self.settings["auto_showing"] = str(not is_auto_showing_enabled)
 
     def print_tasks(self) -> None:
         self.tasks_printer.print_tasks_recursively(
