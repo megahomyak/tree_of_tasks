@@ -2,7 +2,7 @@ from configparser import ConfigParser
 from typing import Optional, Any, Tuple
 
 
-class SettingsManager:
+class INIWorker:
 
     def __init__(
             self, config_parser: ConfigParser,
