@@ -83,10 +83,10 @@ class BoolArgType(BaseArgType):
 
     def __init__(
             self,
-            true_values: Tuple[str] = (
+            true_values: Tuple[str, ...] = (
                 "да", "yes", "д", "y", "1", "+", "истина", "true"
             ),
-            false_values: Tuple[str] = (
+            false_values: Tuple[str, ...] = (
                 "нет", "no", "н", "n", "0", "-", "ложь", "false"
             )
     ):
@@ -125,12 +125,12 @@ class Arg:
 @dataclass
 class Command:
 
-    names: Tuple[str]
+    names: Tuple[str, ...]
     description: str
     attached_function: Callable
-    arguments: Tuple[Arg] = ()
+    arguments: Tuple[Arg, ...] = ()
 
-    def convert_command_to_args(self, command: str) -> Tuple[Any]:
+    def convert_command_to_args(self, command: str) -> Tuple[Any, ...]:
         rgx_result = re.fullmatch(
             pattern=" ".join(
                 [
