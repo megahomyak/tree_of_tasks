@@ -162,33 +162,29 @@ class Command:
     def get_full_description(
             self, include_type_descriptions: bool = False,
             include_heading: bool = False) -> str:
-        if include_type_descriptions:
-            args_description = "\n".join(
-                f"{argument.name}"
-                f" ({argument.type.name} - {argument.type.description})"
-                f" - {argument.description}"
-                for argument in self.arguments
-            )
+        heading_str = (
+            f"Описание команды {self.names[0]}:\n"
+            f"{self.description}\n"
+            f"Псевдонимы:\n"
+            f"{''.join(self.names[1:])}"
+            if len(self.names) > 1 else
+            f"Описание команды {self.names[0]}:\n"
+            f"{self.description}"
+        ) if include_heading else None
+        args = list(
+            f"{argument.name} ({argument.type.name}"
+            f" - {argument.type.description}) - {argument.description}"
+            if include_type_descriptions else
+            f"{argument.name} ({argument.type.name}) - {argument.description}"
+            for argument in self.arguments
+        )
+        if args:
+            args_str = "Аргументы:\n" "\n".join(args)
         else:
-            args_description = "\n".join(
-                f"{argument.name} ({argument.type.name})"
-                f" - {argument.description}"
-                for argument in self.arguments
+            args_str = None
+        return "\n".join(
+            filter(
+                lambda string: string is not None,
+                (heading_str, args_str)
             )
-        if include_heading:
-            if len(self.names) > 1:
-                return (
-                    f"Описание команды {self.names[0]}:\n"
-                    f"{self.description}\n\n"
-                    f"Псевдонимы:\n{''.join(self.names[1:])}\n\n"
-                    "Аргументы:\n"
-                    f"{args_description}"
-                )
-            else:
-                return (
-                    f"Описание команды {self.names[0]}:\n"
-                    f"{self.description}\n\n"
-                    "Аргументы:\n"
-                    f"{args_description}"
-                )
-        return args_description
+        )
