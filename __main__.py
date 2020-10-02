@@ -38,7 +38,7 @@ class MainLogic:
     def show_help_message(self) -> None:
         print("\n\n".join(
             [
-                command.get_full_description()
+                command.get_full_description(include_heading=True)
                 for command in self.commands
             ]
         ))
