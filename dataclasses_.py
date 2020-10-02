@@ -109,7 +109,7 @@ class BoolArgType(BaseArgType):
         return "|".join(self.true_values + self.false_values)
 
     def convert(self, arg: str) -> Any:
-        if arg in self.true_values:
+        if arg.lower() in self.true_values:
             return True
         return False
 
