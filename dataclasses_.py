@@ -220,13 +220,12 @@ class Command:
             include_heading: bool = False) -> str:
         heading_str = (
             f"Описание команды '{self.names[0]}': "
-            f"{self.description}\n"
-            f"Псевдонимы: "
-            f"{', '.join(self.names[1:])}"
-            if len(self.names) > 1 else
-            f"Описание команды '{self.names[0]}': "
             f"{self.description}"
         ) if include_heading else None
+        aliases_str = (
+            f"Псевдонимы: "
+            f"{', '.join(self.names[1:])}"
+        ) if len(self.names) > 1 else None
         args = list(
             f"{argument.name} ({argument.type.name}"
             f" - {argument.type.description}) - {argument.description}"
@@ -235,12 +234,14 @@ class Command:
             for argument in self.arguments
         )
         if args:
-            args_str = "Аргументы:\n" "\n".join(args)
+            temp_args_str = "\n".join(args)
+            args_str = f"Аргументы:\n{temp_args_str}"
+            del temp_args_str
         else:
             args_str = None
         return "\n".join(
             filter(
                 lambda string: string is not None,
-                (heading_str, args_str)
+                (heading_str, aliases_str, args_str)
             )
         )
