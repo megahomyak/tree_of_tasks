@@ -1,6 +1,8 @@
 from configparser import ConfigParser
 from typing import NoReturn
 
+from sqlalchemy.orm.exc import NoResultFound
+
 import dataclasses_
 import db_apis
 import exceptions
@@ -57,6 +59,17 @@ class MainLogic:
                 ("показать", "show", "дерево", "tree"),
                 "выводит в консоль дерево задач",
                 self.print_tasks
+            ),
+            dataclasses_.Command(
+                ("удалить", "delete", "del", "-", "remove", "убрать", "rm"),
+                "удаляет задачу с указанным ID",
+                self.delete_task,
+                (
+                    dataclasses_.Arg(
+                        "ID задачи, которую нужно удалить",
+                        dataclasses_.IntArgType()
+                    ),
+                )
             )
         )
 
@@ -74,8 +87,20 @@ class MainLogic:
             self.print_tasks()
         else:
             print(
-                f"Задачи с id {parent_id} нет, поэтому новая задача не может "
+                f"Задачи с ID {parent_id} нет, поэтому новая задача не может "
                 f"быть создана"
+            )
+
+    def delete_task(self, task_id: int) -> None:
+        try:
+            self.tasks_manager.delete(
+                self.tasks_manager.get_task_by_id(task_id)
+            )
+            self.tasks_manager.commit()
+            self.print_tasks()
+        except NoResultFound:
+            print(
+                f"Задачи с ID {task_id} нет, поэтому она не может быть удалена"
             )
 
     def show_help_message(self) -> None:
