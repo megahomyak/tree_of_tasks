@@ -8,7 +8,7 @@ import db_apis
 import exceptions
 import orm_classes
 from default_fields_for_settings_file import DEFAULT_FIELDS_FOR_SETTINGS
-from ini_worker import INIWorker
+from ini_worker import MyINIWorker
 from text_task_tree_printer import TextTaskTreePrinter as TasksPrinter
 from types_converter import TypesConverter
 
@@ -18,12 +18,11 @@ class MainLogic:
     def __init__(
             self, tasks_manager: db_apis.TasksManager,
             tasks_printer: TasksPrinter,
-            ini_worker: INIWorker,
-            types_converter: TypesConverter) -> None:
+            ini_worker: MyINIWorker) -> None:
         self.tasks_manager = tasks_manager
         self.tasks_printer = tasks_printer
-        self.types_converter = types_converter
         ini_worker.load_fields_if_not_exists(DEFAULT_FIELDS_FOR_SETTINGS)
+        ini_worker.save()
         self.settings = ini_worker
         self.commands = (
             dataclasses_.Command(
@@ -90,7 +89,8 @@ class MainLogic:
             task = orm_classes.Task(text=text, parent_task_id=parent_id)
             self.tasks_manager.append(task)
             self.tasks_manager.commit()
-            self.print_tasks()
+            if self.settings.get_auto_showing_state():
+                self.print_tasks()
         else:
             print(
                 f"Задачи с ID {parent_id} нет, поэтому новая задача не может "
@@ -112,7 +112,8 @@ class MainLogic:
                     f"удалена"
                 )
         if at_least_one_task_is_deleted:
-            self.print_tasks()
+            if self.settings.get_auto_showing_state():
+                self.print_tasks()
 
     def show_help_message(self) -> None:
         print("\n\n".join(
@@ -123,9 +124,7 @@ class MainLogic:
         ))
 
     def switch_auto_showing(self) -> None:
-        is_auto_showing_enabled = self.types_converter.str_to_bool(
-            self.settings["auto_showing"]
-        )
+        is_auto_showing_enabled = self.settings.get_auto_showing_state()
         print(
             "Автопоказ дерева задач после каждой команды теперь "
             f"{'включен' if not is_auto_showing_enabled else 'выключен'}"
@@ -159,10 +158,10 @@ if __name__ == '__main__':
             db_apis.get_sqlalchemy_db_session("sqlite:///tree_of_tasks.db")
         ),
         TasksPrinter(),
-        INIWorker(
+        MyINIWorker(
             ConfigParser(),
-            "tree_of_tasks_config.ini"
-        ),
-        TypesConverter()
+            "tree_of_tasks_config.ini",
+            TypesConverter()
+        )
     )
     main_logic.listen_for_commands_infinitely()
