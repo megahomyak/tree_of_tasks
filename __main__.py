@@ -95,8 +95,45 @@ class MainLogic:
                         )
                     ),
                 )
+            ),
+            dataclasses_.Command(
+                (
+                    "пометить", "чек", "отметить", "выполнить",
+                    "check", "mark", "complete", "x", "х", "X", "Х"
+                ),
+                "помечает задачи как выполненные",
+                self.mark_tasks_as_checked,
+                (
+                    dataclasses_.Arg(
+                        "ID задач, которые нужно пометить выполненными",
+                        dataclasses_.SequenceArgType(
+                            dataclasses_.IntArgType()
+                        ),
+                        (
+                            "ID задач должны быть через запятую без пробела; "
+                            "ID только одной задачи тоже можно написать"
+                        )
+                    ),
+                )
             )
         )
+
+    def mark_tasks_as_checked(self, task_ids: Tuple[int]) -> None:
+        at_least_one_task_is_changed = False
+        for task_id in task_ids:
+            try:
+                self.tasks_manager.get_task_by_id(task_id).is_checked = True
+            except NoResultFound:
+                print(
+                    f"Задачи с ID {task_id} нет, поэтому она не может быть "
+                    f"помечена"
+                )
+            else:
+                self.tasks_manager.commit()
+                at_least_one_task_is_changed = True
+        if at_least_one_task_is_changed:
+            if self.settings.get_auto_showing_state():
+                self.print_tasks()
 
     def add_task(self, parent_id: int, text: str) -> None:
         if (
