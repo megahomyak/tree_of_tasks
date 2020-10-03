@@ -86,7 +86,7 @@ class MainLogic:
                     dataclasses_.Arg(
                         "ID задач, которые нужно удалить",
                         dataclasses_.SequenceArgType(
-                            dataclasses_.IntArgType(),
+                            dataclasses_.IntArgType()
                         ),
                         (
                             "ID задач должны быть через запятую без пробела; "
