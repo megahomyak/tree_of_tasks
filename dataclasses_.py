@@ -55,8 +55,8 @@ class SequenceArgType(BaseArgType):
         self.element_type = element_type
         self.separator = separator
 
-    def convert(self, arg: str) -> Any:
-        return (
+    def convert(self, arg: str) -> Tuple[Any]:
+        return tuple(
             self.element_type.convert(element)
             for element in arg.split(self.separator)
         )
