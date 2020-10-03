@@ -220,8 +220,30 @@ class MainLogic:
                         dataclasses_.OptionalIntArgType()
                     )
                 )
+            ),
+            dataclasses_.Command(
+                ("дата", "date", "time", "время"),
+                "показывает дату (и время) создания задачи",
+                self.show_date,
+                (
+                    dataclasses_.Arg(
+                        "ID задачи",
+                        dataclasses_.IntArgType()
+                    ),
+                )
             )
         )
+
+    def show_date(self, task_id: int) -> None:
+        try:
+            task = self.tasks_manager.get_task_by_id(task_id)
+        except NoResultFound:
+            print(
+                f"Задачи с ID {task_id} нет, поэтому невозможно узнать дату ее "
+                f"создания!"
+            )
+        else:
+            print(f"Дата создания задачи с ID {task_id}: {task.creation_date}")
 
     def change_parent_of_task(self, task_id: int, parent_id: int) -> None:
         try:
