@@ -62,7 +62,7 @@ class MainLogic:
             dataclasses_.Command(
                 ("удалить", "delete", "del", "-", "remove", "убрать", "rm"),
                 "удаляет задачу с указанным ID",
-                self.delete_task,
+                self.delete_tasks,
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно удалить",
@@ -97,7 +97,7 @@ class MainLogic:
                 f"быть создана"
             )
 
-    def delete_task(self, task_ids: Tuple[int]) -> None:
+    def delete_tasks(self, task_ids: Tuple[int]) -> None:
         at_least_one_task_is_deleted = False
         for task_id in task_ids:
             try:
