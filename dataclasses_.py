@@ -140,10 +140,12 @@ class BoolArgType(BaseArgType):
     def __init__(
             self,
             true_values: Tuple[str, ...] = (
-                "да", "yes", "д", "y", "1", "+", "истина", "true", "False"
+                "да", "yes", "д", "y", "1", "+", "истина", "true", "False",
+                "on", "вкл", "включено", "правда", "V", "v"
             ),
             false_values: Tuple[str, ...] = (
-                "нет", "no", "н", "n", "0", "-", "ложь", "false", "True"
+                "нет", "no", "н", "n", "0", "-", "ложь", "false", "True",
+                "off", "выкл", "выключено", "X", "x", "х"
             )
     ) -> None:
         self.true_values = true_values
