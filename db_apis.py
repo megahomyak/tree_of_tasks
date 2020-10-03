@@ -90,7 +90,7 @@ class TasksManager:
             # creation date
             self.db_session
             .query(orm_classes.Task)
-            .filter(filters)
+            .filter(*filters)
             .first()
         ) is not None
 
