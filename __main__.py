@@ -136,6 +136,46 @@ class MainLogic:
                         )
                     ),
                 )
+            ),
+            dataclasses_.Command(
+                ("свернуть", "collapse"),
+                (
+                    "сворачивает задачу, так что все дочерние задачи не будут "
+                    "видны"
+                ),
+                functools.partial(self.change_collapsing_state, True),
+                (
+                    dataclasses_.Arg(
+                        "ID задач, которые нужно свернуть",
+                        dataclasses_.SequenceArgType(
+                            dataclasses_.IntArgType()
+                        ),
+                        (
+                            "ID задач должны быть через запятую без пробела; "
+                            "ID только одной задачи тоже можно написать"
+                        )
+                    ),
+                )
+            ),
+            dataclasses_.Command(
+                ("развернуть", "expand"),
+                (
+                    "разворачивает задачу, так что все дочерние задачи будут "
+                    "видны"
+                ),
+                functools.partial(self.change_collapsing_state, False),
+                (
+                    dataclasses_.Arg(
+                        "ID задач, которые нужно свернуть",
+                        dataclasses_.SequenceArgType(
+                            dataclasses_.IntArgType()
+                        ),
+                        (
+                            "ID задач должны быть через запятую без пробела; "
+                            "ID только одной задачи тоже можно написать"
+                        )
+                    ),
+                )
             )
         )
 
@@ -149,6 +189,26 @@ class MainLogic:
                     "она не может быть помечена"
                     if state else
                     "с нее нельзя убрать метку"
+                )
+                print(f"Задачи с ID {task_id} нет, поэтому {reason}")
+            else:
+                self.tasks_manager.commit()
+                at_least_one_task_is_changed = True
+        if at_least_one_task_is_changed:
+            if self.settings.get_auto_showing_state():
+                self.print_tasks()
+
+    def change_collapsing_state(
+            self, state: bool, task_ids: Tuple[int]) -> None:
+        at_least_one_task_is_changed = False
+        for task_id in task_ids:
+            try:
+                self.tasks_manager.get_task_by_id(task_id).is_collapsed = state
+            except NoResultFound:
+                reason = (
+                    "она не может быть свернута"
+                    if state else
+                    "она не может быть развернута"
                 )
                 print(f"Задачи с ID {task_id} нет, поэтому {reason}")
             else:
