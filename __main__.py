@@ -21,6 +21,7 @@ class MainLogic:
             ini_worker: MyINIWorker) -> None:
         self.tasks_manager = tasks_manager
         self.tasks_printer = tasks_printer
+        ini_worker.load()
         ini_worker.load_fields_if_not_exists(DEFAULT_FIELDS_FOR_SETTINGS)
         ini_worker.save()
         self.settings = ini_worker
