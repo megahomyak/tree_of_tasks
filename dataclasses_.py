@@ -164,7 +164,12 @@ class BoolArgType(BaseArgType):
 
     @property
     def regex(self) -> str:
-        return "|".join(self.true_values + self.false_values)
+        return "|".join(
+            [
+                re.escape(value)
+                for value in self.true_values + self.false_values
+            ]
+        )
 
     def convert(self, arg: str) -> bool:
         if arg.lower() in self.true_values:
