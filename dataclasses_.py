@@ -196,8 +196,8 @@ class Command:
                     *[
                         f"({arg.type.regex})"
                         for arg in self.arguments
-                    ]
-                ]  # Something like (\d\d)
+                    ]  # Something like (\d\d)
+                ]  # Something like (?:command) (\d\d)
             ),
             string=command
         )
