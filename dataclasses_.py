@@ -240,13 +240,24 @@ class Command:
             f"Псевдонимы: "
             f"{', '.join(self.names[1:])}"
         ) if len(self.names) > 1 else None
-        args = list(
-            f"{argument.name} ({argument.type.name}"
-            f" - {argument.type.description}) - {argument.description}"
-            if include_type_descriptions else
-            f"{argument.name} ({argument.type.name}) - {argument.description}"
-            for argument in self.arguments
-        )
+        args = []
+        for argument in self.arguments:
+            temp_desc = (
+                f" - {argument.description}"
+                if argument.description is not None else
+                ""
+            )
+            temp_type_desc = (
+                f" - {argument.type.description}"
+                if argument.type.description is not None else
+                ""
+            )
+            args.append(
+                f"{argument.name} ({argument.type.name}"
+                f"{temp_type_desc}){temp_desc}"
+                if include_type_descriptions else
+                f"{argument.name} ({argument.type.name}){temp_desc}"
+            )
         if args:
             temp_args_str = "\n".join(args)
             args_str = f"Аргументы:\n{temp_args_str}"
