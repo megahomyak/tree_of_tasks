@@ -3,7 +3,7 @@ from typing import List, Any
 import sqlalchemy.orm
 from sqlalchemy import create_engine
 
-import orm_classes
+from orm import orm_classes
 
 
 def get_sqlalchemy_db_session(path_to_db: str) -> sqlalchemy.orm.Session:

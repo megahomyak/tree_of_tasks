@@ -5,11 +5,12 @@ from typing import NoReturn, Tuple, List
 from sqlalchemy.orm.exc import NoResultFound
 
 import dataclasses_
-import db_apis
 import exceptions
-import orm_classes
-from default_fields_for_settings_file import DEFAULT_FIELDS_FOR_SETTINGS
-from ini_worker import MyINIWorker
+from orm import db_apis, orm_classes
+from scripts_for_settings.default_fields_for_settings_file import (
+    DEFAULT_FIELDS_FOR_SETTINGS
+)
+from scripts_for_settings.ini_worker import MyINIWorker
 from types_converter import TypesConverter
 
 
