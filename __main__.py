@@ -178,6 +178,24 @@ class MainLogic:
                         )
                     ),
                 )
+            ),
+            dataclasses_.Command(
+                (
+                    "изменить", "редактировать", "отредактировать",
+                    "change", "edit"
+                ),
+                "изменяет текст указанной задачи",
+                self.edit_task,
+                (
+                    dataclasses_.Arg(
+                        "ID задачи",
+                        dataclasses_.IntArgType()
+                    ),
+                    dataclasses_.Arg(
+                        "текст задачи",
+                        dataclasses_.StringArgType()
+                    )
+                )
             )
         )
 
@@ -238,6 +256,20 @@ class MainLogic:
                 f"Задачи с ID {parent_id} нет, поэтому новая задача не может "
                 f"быть создана"
             )
+
+    def edit_task(self, task_id: int, text: str) -> None:
+        try:
+            task = self.tasks_manager.get_task_by_id(task_id)
+        except NoResultFound:
+            print(
+                f"Задачи с ID {task_id} нет, поэтому она не может быть "
+                f"изменена!"
+            )
+        else:
+            task.text = text
+            self.tasks_manager.commit()
+            if self.settings.get_auto_showing_state():
+                self.print_tasks()
 
     def delete_tasks(self, task_ids: Tuple[int]) -> None:
         at_least_one_task_is_deleted = False
