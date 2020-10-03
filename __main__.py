@@ -246,7 +246,7 @@ class MainLogic:
                 orm_classes.Task.id == parent_id
             )
         ):
-            task = orm_classes.Task(text=text, parent_task_id=parent_id)
+            task = orm_classes.Task(text=text, parent_id=parent_id)
             self.tasks_manager.append(task)
             self.tasks_manager.commit()
             if self.settings.get_auto_showing_state():

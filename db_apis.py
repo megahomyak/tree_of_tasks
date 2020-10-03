@@ -70,7 +70,7 @@ class TasksManager:
         """
         return (
             self._get_query()
-            .filter_by(parent_task_id=None)
+            .filter_by(parent_id=None)
             .all()
         )
 
