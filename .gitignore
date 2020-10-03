@@ -213,3 +213,4 @@ dmypy.json
 cython_debug/
 
 /tree_of_tasks.db
+/tree_of_tasks_config.ini
