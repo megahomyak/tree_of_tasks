@@ -1,3 +1,4 @@
+import functools
 from configparser import ConfigParser
 from typing import NoReturn, Tuple, List
 
@@ -105,7 +106,7 @@ class MainLogic:
                     "check", "mark", "complete", "x", "х", "X", "Х"
                 ),
                 "помечает задачи как выполненные",
-                self.mark_tasks_as_checked,
+                functools.partial(self.change_checked_state, True),
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно пометить выполненными",
@@ -118,14 +119,31 @@ class MainLogic:
                         )
                     ),
                 )
+            ),
+            dataclasses_.Command(
+                ("убрать метку", "снять метку", "uncheck"),
+                "помечает задачи как невыполненные",
+                functools.partial(self.change_checked_state, False),
+                (
+                    dataclasses_.Arg(
+                        "ID задач, которые нужно пометить невыполненными",
+                        dataclasses_.SequenceArgType(
+                            dataclasses_.IntArgType()
+                        ),
+                        (
+                            "ID задач должны быть через запятую без пробела; "
+                            "ID только одной задачи тоже можно написать"
+                        )
+                    ),
+                )
             )
         )
 
-    def mark_tasks_as_checked(self, task_ids: Tuple[int]) -> None:
+    def change_checked_state(self, state: bool, task_ids: Tuple[int]) -> None:
         at_least_one_task_is_changed = False
         for task_id in task_ids:
             try:
-                self.tasks_manager.get_task_by_id(task_id).is_checked = True
+                self.tasks_manager.get_task_by_id(task_id).is_checked = state
             except NoResultFound:
                 print(
                     f"Задачи с ID {task_id} нет, поэтому она не может быть "
@@ -259,7 +277,6 @@ if __name__ == '__main__':
         db_apis.TasksManager(
             db_apis.get_sqlalchemy_db_session("sqlite:///tree_of_tasks.db")
         ),
-        TasksPrinter(),
         MyINIWorker(
             ConfigParser(),
             "tree_of_tasks_config.ini",
