@@ -349,10 +349,11 @@ class MainLogic:
             self,
             root_tasks: List[orm_classes.Task],
             indentation_level: int = 0,
-            indent_size: int = 4) -> List[str]:
+            indent_size: int = 4,
+            indentation_symbol: str = " ") -> List[str]:
         for task in root_tasks:
             task_as_str = (
-                f"{' ' * (indentation_level * indent_size)}"
+                f"{indentation_symbol * (indentation_level * indent_size)}"
                 f"[{'+' if task.is_collapsed else '-'}]"
                 f"[{'X' if task.is_checked else ' '}]"
                 f"[ID: {task.id}]"
@@ -363,7 +364,8 @@ class MainLogic:
                 yield from self.get_all_tasks_as_strings(
                     task.nested_tasks,
                     indentation_level + 1,
-                    indent_size
+                    indent_size,
+                    indentation_symbol
                 )
 
 
