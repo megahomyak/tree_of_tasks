@@ -1,6 +1,8 @@
 from configparser import ConfigParser, SectionProxy
 from typing import Optional, Any, Tuple, Dict, Union
 
+from types_converter import TypesConverter
+
 
 class INIWorker:
 
@@ -97,17 +99,25 @@ class INIWorker:
             )
         )
 
-    def __getitem__(self, section: str, name: str) -> str:
+    def __getitem__(self, section_and_key: Union[Tuple[str, str], str]) -> str:
         """
-        Gets the value (as string, how else) of the specified key
+        Gets the value of the specified key.
+        VALUES AND SECTION NAMES IS STORED AS STRINGS ONLY!
 
         Args:
-            section: name of the section, where the value is
-            name: name of the value (key to value)
+            section_and_key:
+                tuple of two strings - section name and key
+                OR
+                key, then section is self.default_section
 
         Returns:
             received value (as string, because they are stored as strings...)
         """
+        if isinstance(section_and_key, str):
+            section = self.default_section
+            name = section_and_key
+        else:
+            section, name = section_and_key
         return self.config_parser[section][name]
 
     def __setitem__(
