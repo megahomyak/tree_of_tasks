@@ -102,8 +102,7 @@ class TasksManager:
             found task
 
         Raises:
-            sqlalchemy.orm.exc.NoResultFound or
-            sqlalchemy.orm.exc.MultipleResultsFound
+            sqlalchemy.orm.exc.NoResultFound
         """
         return (
             self._get_query()
