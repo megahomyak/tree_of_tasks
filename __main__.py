@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from typing import NoReturn, Tuple
+from typing import NoReturn, Tuple, List
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -9,7 +9,6 @@ import exceptions
 import orm_classes
 from default_fields_for_settings_file import DEFAULT_FIELDS_FOR_SETTINGS
 from ini_worker import MyINIWorker
-from text_task_tree_printer import TextTaskTreePrinter as TasksPrinter
 from types_converter import TypesConverter
 
 
@@ -17,10 +16,8 @@ class MainLogic:
 
     def __init__(
             self, tasks_manager: db_apis.TasksManager,
-            tasks_printer: TasksPrinter,
             ini_worker: MyINIWorker) -> None:
         self.tasks_manager = tasks_manager
-        self.tasks_printer = tasks_printer
         ini_worker.load()
         ini_worker.load_fields_if_not_exists(DEFAULT_FIELDS_FOR_SETTINGS)
         ini_worker.save()
@@ -209,8 +206,10 @@ class MainLogic:
     def print_tasks(self) -> None:
         root_tasks = self.tasks_manager.get_root_tasks()
         if root_tasks:
-            self.tasks_printer.print_tasks_recursively(
-                root_tasks
+            print(
+                self.get_all_tasks_as_string(
+                    root_tasks
+                )
             )
         else:
             print("<дерево пустое>")
@@ -229,6 +228,30 @@ class MainLogic:
                     break
             else:
                 print("Что?")
+
+    def get_all_tasks_as_string(
+            self,
+            root_tasks: List[orm_classes.Task],
+            indentation_level: int = 0,
+            indent_size: int = 4) -> str:
+        for task in root_tasks:
+            task_as_str = (
+                f"{' ' * (indentation_level * indent_size)}"
+                f"[{'-' if task.nested_tasks_is_shown else '+'}]"
+                f"[{'X' if task.is_checked else ' '}]"
+                f"[ID: {task.id}]"
+                f" {task.text}"
+            )
+            if task.nested_tasks_is_shown:
+                next_tasks_as_str = self.get_all_tasks_as_string(
+                    task.nested_tasks,
+                    indentation_level + 1,
+                    indent_size
+                )
+                if next_tasks_as_str:
+                    return f"{task_as_str}\n{next_tasks_as_str}"
+                return task_as_str
+            return task_as_str
 
 
 if __name__ == '__main__':
