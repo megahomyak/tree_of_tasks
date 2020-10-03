@@ -26,7 +26,7 @@ class MainLogic:
         self.settings = ini_worker
         self.commands = (
             dataclasses_.Command(
-                ("автопоказ", "autoshowing", "авто показ", "auto showing"),
+                ("автопоказ", "autoshowing"),
                 "переключает показ дерева задач после каждого изменения",
                 self.switch_auto_showing
             ),
