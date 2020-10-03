@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from typing import NoReturn
+from typing import NoReturn, Tuple
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -66,8 +66,14 @@ class MainLogic:
                 self.delete_task,
                 (
                     dataclasses_.Arg(
-                        "ID задачи, которую нужно удалить",
-                        dataclasses_.IntArgType()
+                        "ID задач, которые нужно удалить",
+                        dataclasses_.SequenceArgType(
+                            dataclasses_.IntArgType(),
+                        ),
+                        (
+                            "ID задач должны быть через запятую без пробела; "
+                            "ID только одной задачи тоже можно написать"
+                        )
                     ),
                 )
             )
@@ -91,17 +97,22 @@ class MainLogic:
                 f"быть создана"
             )
 
-    def delete_task(self, task_id: int) -> None:
-        try:
-            self.tasks_manager.delete(
-                self.tasks_manager.get_task_by_id(task_id)
-            )
-            self.tasks_manager.commit()
+    def delete_task(self, task_ids: Tuple[int]) -> None:
+        at_least_one_task_is_deleted = False
+        for task_id in task_ids:
+            try:
+                self.tasks_manager.delete(
+                    self.tasks_manager.get_task_by_id(task_id)
+                )
+                self.tasks_manager.commit()
+                at_least_one_task_is_deleted = True
+            except NoResultFound:
+                print(
+                    f"Задачи с ID {task_id} нет, поэтому она не может быть "
+                    f"удалена"
+                )
+        if at_least_one_task_is_deleted:
             self.print_tasks()
-        except NoResultFound:
-            print(
-                f"Задачи с ID {task_id} нет, поэтому она не может быть удалена"
-            )
 
     def show_help_message(self) -> None:
         print("\n\n".join(

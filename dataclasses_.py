@@ -37,6 +37,31 @@ class BaseArgType(ABC):
         pass
 
 
+class SequenceArgType(BaseArgType):
+
+    @property
+    def name(self) -> str:
+        return f"последовательность <{self.element_type.name}>"
+
+    @property
+    def regex(self) -> str:
+        return (
+            f"{self.element_type.regex}"
+            f"(?:{self.separator}{self.element_type.regex})*"
+        )
+
+    def __init__(
+            self, element_type: BaseArgType, separator: str = ",") -> None:
+        self.element_type = element_type
+        self.separator = separator
+
+    def convert(self, arg: str) -> Any:
+        return (
+            self.element_type.convert(element)
+            for element in arg.split(self.separator)
+        )
+
+
 class IntArgType(BaseArgType):
 
     @property
