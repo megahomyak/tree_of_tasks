@@ -145,10 +145,12 @@ class MainLogic:
             try:
                 self.tasks_manager.get_task_by_id(task_id).is_checked = state
             except NoResultFound:
-                print(
-                    f"Задачи с ID {task_id} нет, поэтому она не может быть "
-                    f"помечена"
+                reason = (
+                    "она не может быть помечена"
+                    if state else
+                    "с нее нельзя убрать метку"
                 )
+                print(f"Задачи с ID {task_id} нет, поэтому {reason}")
             else:
                 self.tasks_manager.commit()
                 at_least_one_task_is_changed = True
