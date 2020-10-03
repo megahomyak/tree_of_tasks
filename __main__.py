@@ -257,12 +257,12 @@ class MainLogic:
         for task in root_tasks:
             task_as_str = (
                 f"{' ' * (indentation_level * indent_size)}"
-                f"[{'-' if task.nested_tasks_is_shown else '+'}]"
+                f"[{'+' if task.is_collapsed else '-'}]"
                 f"[{'X' if task.is_checked else ' '}]"
                 f"[ID: {task.id}]"
                 f" {task.text}"
             )
-            if task.nested_tasks_is_shown:
+            if not task.is_collapsed:
                 next_tasks_as_str = self.get_all_tasks_as_string(
                     task.nested_tasks,
                     indentation_level + 1,

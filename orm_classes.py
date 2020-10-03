@@ -14,7 +14,7 @@ class Task(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     text = Column(String, nullable=False)
     is_checked = Column(Boolean, default=False, nullable=False)
-    nested_tasks_is_shown = Column(Boolean, default=True, nullable=False)
+    is_collapsed = Column(Boolean, default=False, nullable=False)
     parent_task_id = Column(Integer, ForeignKey("tasks.id"), default=None)
     creation_date = Column(DateTime, default=datetime.now())
 
