@@ -28,8 +28,14 @@ class MainLogic:
         self.commands = (
             dataclasses_.Command(
                 ("автопоказ", "autoshowing"),
-                "переключает показ дерева задач после каждого изменения",
-                self.switch_auto_showing
+                "включает/выключает показ дерева задач после каждого изменения",
+                self.change_auto_showing,
+                (
+                    dataclasses_.Arg(
+                        "состояние настройки",
+                        dataclasses_.BoolArgType()
+                    ),
+                )
             ),
             dataclasses_.Command(
                 ("помощь", "команды", "help", "commands"),
@@ -192,13 +198,12 @@ class MainLogic:
                     )
         print("\n\n".join(commands_info))
 
-    def switch_auto_showing(self) -> None:
-        is_auto_showing_enabled = self.settings.get_auto_showing_state()
+    def change_auto_showing(self, state: bool) -> None:
         print(
             "Автопоказ дерева задач после каждой команды теперь "
-            f"{'включен' if not is_auto_showing_enabled else 'выключен'}"
+            f"{'включен' if state else 'выключен'}"
         )
-        self.settings["auto_showing"] = str(not is_auto_showing_enabled)
+        self.settings["auto_showing"] = str(state)
         self.settings.save()
 
     def print_tasks(self) -> None:
