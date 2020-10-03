@@ -1,7 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Tuple, Any, Callable, Union
+from typing import Tuple, Any, Callable, Union, Optional
 
 import exceptions
 
@@ -48,6 +48,13 @@ class SequenceArgType(BaseArgType):
         return (
             f"{self.element_type.regex}"
             f"(?:{self.separator}{self.element_type.regex})*"
+        )
+
+    @property
+    def description(self) -> str:
+        return (
+            f"От 1 до бесконечности элементов типа '{self.element_type.name}', "
+            f"разделенных через '{self.separator}'"
         )
 
     def __init__(
