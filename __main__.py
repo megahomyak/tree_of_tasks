@@ -321,8 +321,10 @@ class MainLogic:
         root_tasks = self.tasks_manager.get_root_tasks()
         if root_tasks:
             print(
-                self.get_all_tasks_as_string(
-                    root_tasks
+                "\n".join(
+                    self.get_all_tasks_as_strings(
+                        root_tasks
+                    )
                 )
             )
         else:
@@ -343,11 +345,11 @@ class MainLogic:
             else:
                 print("Что?")
 
-    def get_all_tasks_as_string(
+    def get_all_tasks_as_strings(
             self,
             root_tasks: List[orm_classes.Task],
             indentation_level: int = 0,
-            indent_size: int = 4) -> str:
+            indent_size: int = 4) -> List[str]:
         for task in root_tasks:
             task_as_str = (
                 f"{' ' * (indentation_level * indent_size)}"
@@ -356,16 +358,13 @@ class MainLogic:
                 f"[ID: {task.id}]"
                 f" {task.text}"
             )
-            if not task.is_collapsed:
-                next_tasks_as_str = self.get_all_tasks_as_string(
+            yield task_as_str
+            if not task.is_collapsed and task.nested_tasks:
+                yield from self.get_all_tasks_as_strings(
                     task.nested_tasks,
                     indentation_level + 1,
                     indent_size
                 )
-                if next_tasks_as_str:
-                    return f"{task_as_str}\n{next_tasks_as_str}"
-                return task_as_str
-            return task_as_str
 
 
 if __name__ == '__main__':
