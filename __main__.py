@@ -132,9 +132,13 @@ class MainLogic:
         self.settings["auto_showing"] = str(not is_auto_showing_enabled)
 
     def print_tasks(self) -> None:
-        self.tasks_printer.print_tasks_recursively(
-            self.tasks_manager.get_root_tasks()
-        )
+        root_tasks = self.tasks_manager.get_root_tasks()
+        if root_tasks:
+            self.tasks_printer.print_tasks_recursively(
+                root_tasks
+            )
+        else:
+            print("<дерево пустое>")
 
     def listen_for_commands_infinitely(self) -> NoReturn:
         while True:
