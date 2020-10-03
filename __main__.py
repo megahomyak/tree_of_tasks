@@ -36,6 +36,24 @@ class MainLogic:
                 self.show_help_message
             ),
             dataclasses_.Command(
+                ("помощь", "команды", "help", "commands"),
+                "показывает помощь по конкретным командам",
+                self.show_help_message_for_specific_commands,
+                (
+                    dataclasses_.Arg(
+                        "названия команд",
+                        dataclasses_.SequenceArgType(
+                            dataclasses_.StringArgType()
+                        ),
+                        (
+                            "названия команд должны быть через запятую без "
+                            "пробела; название только одной команды тоже можно "
+                            "написать"
+                        )
+                    ),
+                )
+            ),
+            dataclasses_.Command(
                 ("добавить", "add", "+"),
                 (
                     "добавляет задачу с указанным "
@@ -122,6 +140,17 @@ class MainLogic:
                 for command in self.commands
             ]
         ))
+
+    def show_help_message_for_specific_commands(
+            self, command_names: Tuple[str]) -> None:
+        commands_info = []
+        for command_name in command_names:
+            for command in self.commands:
+                if command_name in command.names:
+                    commands_info.append(
+                        command.get_full_description(include_heading=True)
+                    )
+        print("\n\n".join(commands_info))
 
     def switch_auto_showing(self) -> None:
         is_auto_showing_enabled = self.settings.get_auto_showing_state()
