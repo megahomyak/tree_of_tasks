@@ -4,6 +4,7 @@ from typing import NoReturn
 import dataclasses_
 import db_apis
 import exceptions
+import orm_classes
 from default_fields_for_settings_file import DEFAULT_FIELDS_FOR_SETTINGS
 from ini_worker import INIWorker
 from text_task_tree_printer import TextTaskTreePrinter as TasksPrinter
@@ -32,8 +33,44 @@ class MainLogic:
                 ("помощь", "команды", "help", "commands"),
                 "показывает список команд",
                 self.show_help_message
+            ),
+            dataclasses_.Command(
+                ("добавить", "add", "+"),
+                (
+                    "добавляет задачу с указанным "
+                    "родителем (необязательно) и текстом"
+                ),
+                self.add_task,
+                (
+                    dataclasses_.Arg(
+                        "ID родителя",
+                        dataclasses_.OptionalIntArgType(is_signed=False),
+                        "ID задачи, в которую будет вложена добавляемая задача"
+                    ),
+                    dataclasses_.Arg(
+                        "текст новой задачи",
+                        dataclasses_.StringArgType()
+                    )
+                )
             )
         )
+
+    def add_task(self, parent_id: int, text: str) -> None:
+        if (
+            parent_id is None
+            or
+            self.tasks_manager.check_existence(
+                orm_classes.Task.id == parent_id
+            )
+        ):
+            task = orm_classes.Task(text=text, parent_task_id=parent_id)
+            self.tasks_manager.append(task)
+            self.tasks_manager.commit()
+        else:
+            print(
+                f"Задачи с id {parent_id} нет, поэтому новая задача не может"
+                f"быть создана"
+            )
 
     def show_help_message(self) -> None:
         print("\n\n".join(
