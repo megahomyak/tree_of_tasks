@@ -74,7 +74,7 @@ class MainLogic:
             self.print_tasks()
         else:
             print(
-                f"Задачи с id {parent_id} нет, поэтому новая задача не может"
+                f"Задачи с id {parent_id} нет, поэтому новая задача не может "
                 f"быть создана"
             )
 
