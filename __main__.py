@@ -130,6 +130,7 @@ class MainLogic:
             f"{'включен' if not is_auto_showing_enabled else 'выключен'}"
         )
         self.settings["auto_showing"] = str(not is_auto_showing_enabled)
+        self.settings.save()
 
     def print_tasks(self) -> None:
         root_tasks = self.tasks_manager.get_root_tasks()
