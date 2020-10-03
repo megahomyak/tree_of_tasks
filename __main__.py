@@ -45,7 +45,7 @@ class MainLogic:
                 (
                     dataclasses_.Arg(
                         "ID родителя",
-                        dataclasses_.OptionalIntArgType(is_signed=False),
+                        dataclasses_.OptionalIntArgType(),
                         "ID задачи, в которую будет вложена добавляемая задача"
                     ),
                     dataclasses_.Arg(
