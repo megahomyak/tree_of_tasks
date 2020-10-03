@@ -23,8 +23,8 @@ class BaseArgType(ABC):
         pass
 
     @property
-    def description(self) -> str:
-        return "<описание отсутствует>"
+    def description(self) -> Optional[str]:
+        return None
 
     @abstractmethod
     def convert(self, arg: str) -> Any:
@@ -189,7 +189,7 @@ class Arg:
 
     name: str
     type: BaseArgType
-    description: str = "<описание отсутствует>"
+    description: Optional[str] = None
 
 
 @dataclass
