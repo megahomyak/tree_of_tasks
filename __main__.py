@@ -23,6 +23,8 @@ class MainLogic:
         ini_worker.load_fields_if_not_exists(DEFAULT_FIELDS_FOR_SETTINGS)
         ini_worker.save()
         self.settings = ini_worker
+        if self.settings.get_auto_showing_state():
+            self.print_tasks()
         self.commands = (
             dataclasses_.Command(
                 ("автопоказ", "autoshowing"),
