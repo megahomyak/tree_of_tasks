@@ -123,13 +123,14 @@ class MainLogic:
                 self.tasks_manager.delete(
                     self.tasks_manager.get_task_by_id(task_id)
                 )
-                self.tasks_manager.commit()
-                at_least_one_task_is_deleted = True
             except NoResultFound:
                 print(
                     f"Задачи с ID {task_id} нет, поэтому она не может быть "
                     f"удалена"
                 )
+            else:
+                self.tasks_manager.commit()
+                at_least_one_task_is_deleted = True
         if at_least_one_task_is_deleted:
             if self.settings.get_auto_showing_state():
                 self.print_tasks()
