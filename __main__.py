@@ -196,8 +196,61 @@ class MainLogic:
                         dataclasses_.StringArgType()
                     )
                 )
+            ),
+            dataclasses_.Command(
+                (
+                    "изменить ID родителя", "change parent ID",
+                    "отредактировать ID родителя", "edit parent ID",
+                    "установить ID родителя", "set parent ID"
+                ),
+                (
+                    "изменяет ID родителя указанной задачи (задача "
+                    "\"переезжает\" в дочерние к другой задаче); "
+                    "ID родителя может быть пропущено (-), тогда задача "
+                    "станет корневой"
+                ),
+                self.change_parent_of_task,
+                (
+                    dataclasses_.Arg(
+                        "ID задачи",
+                        dataclasses_.IntArgType()
+                    ),
+                    dataclasses_.Arg(
+                        "ID нового родителя",
+                        dataclasses_.OptionalIntArgType()
+                    )
+                )
             )
         )
+
+    def change_parent_of_task(self, task_id: int, parent_id: int) -> None:
+        try:
+            task = self.tasks_manager.get_task_by_id(task_id)
+        except NoResultFound:
+            print(
+                f"Задачи с ID {task_id} нет, поэтому она не может быть "
+                f"изменена!"
+            )
+        else:
+            if task_id == parent_id:
+                print(
+                    f"Задача не может быть родителем самой себя! "
+                    f"({task_id} == {parent_id})"
+                )
+            else:
+                if (
+                    parent_id is None
+                    or
+                    self.tasks_manager.check_existence(
+                        orm_classes.Task.id == parent_id
+                    )
+                ):
+                    task.parent_id = parent_id
+                    self.tasks_manager.commit()
+                    if self.settings.get_auto_showing_state():
+                        self.print_tasks()
+                else:
+                    print(f"Задачи с ID {parent_id} нет!")
 
     def change_checked_state(self, state: bool, task_ids: Tuple[int]) -> None:
         at_least_one_task_is_changed = False
