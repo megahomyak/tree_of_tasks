@@ -52,6 +52,11 @@ class MainLogic:
                         dataclasses_.StringArgType()
                     )
                 )
+            ),
+            dataclasses_.Command(
+                ("показать", "show", "дерево", "tree"),
+                "выводит в консоль дерево задач",
+                self.print_tasks
             )
         )
 
@@ -66,6 +71,7 @@ class MainLogic:
             task = orm_classes.Task(text=text, parent_task_id=parent_id)
             self.tasks_manager.append(task)
             self.tasks_manager.commit()
+            self.print_tasks()
         else:
             print(
                 f"Задачи с id {parent_id} нет, поэтому новая задача не может"
