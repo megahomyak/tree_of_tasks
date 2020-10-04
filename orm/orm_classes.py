@@ -16,7 +16,7 @@ class Task(DeclarativeBase):
     is_checked = Column(Boolean, default=False, nullable=False)
     is_collapsed = Column(Boolean, default=False, nullable=False)
     parent_id = Column(Integer, ForeignKey("tasks.id"), default=None)
-    creation_date = Column(DateTime, default=datetime.now())
+    creation_date = Column(DateTime, default=datetime.now)
 
     nested_tasks = relationship("Task", cascade="save-update, delete")
 
