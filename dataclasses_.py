@@ -1,9 +1,11 @@
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Tuple, Any, Callable, Union, Optional
+from typing import Tuple, Any, Callable, Union, Optional, Type
 
 import exceptions
+from orm.db_apis import TasksManager
+from scripts_for_settings.ini_worker import MyINIWorker
 
 
 class BaseArgType(ABC):
@@ -196,12 +198,57 @@ class Arg:
 
 
 @dataclass
+class Context:
+
+    tasks_manager: TasksManager
+    ini_worker: MyINIWorker
+    commands: Tuple["Command", ...]
+
+
+class BaseMetadata(ABC):
+
+    @staticmethod
+    @abstractmethod
+    def get_data_from_context(context: Context) -> Any:
+        pass
+
+
+class TasksManagerMetadata(BaseMetadata):
+
+    @staticmethod
+    def get_data_from_context(context: Context) -> Any:
+        return context.tasks_manager
+
+
+class CommandsMetadata(BaseMetadata):
+
+    @staticmethod
+    def get_data_from_context(context: Context) -> Any:
+        return context.commands
+
+
+class INIWorkerMetadata(BaseMetadata):
+
+    @staticmethod
+    def get_data_from_context(context: Context) -> Any:
+        return context.ini_worker
+
+
+class RootTasksMetadata(BaseMetadata):
+
+    @staticmethod
+    def get_data_from_context(context: Context) -> Any:
+        return context.tasks_manager.get_root_tasks()
+
+
+@dataclass
 class Command:
 
     names: Tuple[str, ...]
     description: str
     attached_function: Callable
     arguments: Tuple[Arg, ...] = ()
+    metadata_tuple: Tuple[Type[BaseMetadata], ...] = ()
 
     def convert_command_to_args(self, command: str) -> Tuple[Any, ...]:
         rgx_result = re.fullmatch(
@@ -230,6 +277,12 @@ class Command:
                     for arg in self.arguments
                 ]
             )
+        )
+
+    def get_all_metadata_as_converted(self, context: Context) -> Tuple[Any]:
+        return tuple(
+            one_metadata.get_data_from_context(context)
+            for one_metadata in self.metadata_tuple
         )
 
     def get_full_description(
