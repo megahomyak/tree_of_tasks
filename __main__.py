@@ -1,6 +1,6 @@
 import functools
 from configparser import ConfigParser
-from typing import NoReturn, Tuple, List
+from typing import NoReturn, Tuple, List, Optional
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -25,7 +25,7 @@ class MainLogic:
         ini_worker.save()
         self.settings = ini_worker
         if self.settings.get_auto_showing_state():
-            self.print_tasks()
+            print(self.get_local_tasks_as_string())
         self.commands = (
             dataclasses_.Command(
                 ("автопоказ", "autoshowing"),
@@ -41,12 +41,12 @@ class MainLogic:
             dataclasses_.Command(
                 ("помощь", "команды", "help", "commands"),
                 "показывает список команд",
-                self.show_help_message
+                self.get_help_message
             ),
             dataclasses_.Command(
                 ("помощь", "команды", "help", "commands"),
                 "показывает помощь по конкретным командам",
-                self.show_help_message_for_specific_commands,
+                self.get_help_message_for_specific_commands,
                 (
                     dataclasses_.Arg(
                         "названия команд",
@@ -84,7 +84,7 @@ class MainLogic:
             dataclasses_.Command(
                 ("показать", "show", "дерево", "tree"),
                 "выводит в консоль дерево задач",
-                self.print_tasks
+                self.get_tasks_as_string
             ),
             dataclasses_.Command(
                 ("удалить", "delete", "del", "-", "remove", "убрать", "rm"),
@@ -235,28 +235,32 @@ class MainLogic:
             )
         )
 
-    def show_date(self, task_id: int) -> None:
+    def get_local_tasks_as_string(self):
+        return self.get_tasks_as_string(self.tasks_manager.get_root_tasks())
+
+    def show_date(self, task_id: int) -> str:
         try:
             task = self.tasks_manager.get_task_by_id(task_id)
         except NoResultFound:
-            print(
+            return (
                 f"Задачи с ID {task_id} нет, поэтому невозможно узнать дату ее "
                 f"создания!"
             )
         else:
-            print(f"Дата создания задачи с ID {task_id}: {task.creation_date}")
+            return f"Дата создания задачи с ID {task_id}: {task.creation_date}"
 
-    def change_parent_of_task(self, task_id: int, parent_id: int) -> None:
+    def change_parent_of_task(
+            self, task_id: int, parent_id: int) -> Optional[str]:
         try:
             task = self.tasks_manager.get_task_by_id(task_id)
         except NoResultFound:
-            print(
+            return (
                 f"Задачи с ID {task_id} нет, поэтому она не может быть "
                 f"изменена!"
             )
         else:
             if task_id == parent_id:
-                print(
+                return (
                     f"Задача не может быть родителем самой себя! "
                     f"({task_id} == {parent_id})"
                 )
@@ -270,13 +274,13 @@ class MainLogic:
                 ):
                     task.parent_id = parent_id
                     self.tasks_manager.commit()
-                    if self.settings.get_auto_showing_state():
-                        self.print_tasks()
                 else:
-                    print(f"Задачи с ID {parent_id} нет!")
+                    return f"Задачи с ID {parent_id} нет!"
 
-    def change_checked_state(self, state: bool, task_ids: Tuple[int]) -> None:
-        at_least_one_task_is_changed = False
+    def change_checked_state(
+            self, state: bool,
+            task_ids: Tuple[int]) -> Optional[str]:
+        errors = []
         for task_id in task_ids:
             try:
                 self.tasks_manager.get_task_by_id(task_id).is_checked = state
@@ -286,17 +290,15 @@ class MainLogic:
                     if state else
                     "с нее нельзя убрать метку"
                 )
-                print(f"Задачи с ID {task_id} нет, поэтому {reason}")
+                errors.append(f"Задачи с ID {task_id} нет, поэтому {reason}")
             else:
                 self.tasks_manager.commit()
-                at_least_one_task_is_changed = True
-        if at_least_one_task_is_changed:
-            if self.settings.get_auto_showing_state():
-                self.print_tasks()
+        return "\n".join(errors) if errors else None
 
     def change_collapsing_state(
-            self, state: bool, task_ids: Tuple[int]) -> None:
-        at_least_one_task_is_changed = False
+            self, state: bool,
+            task_ids: Tuple[int]) -> Optional[str]:
+        errors = []
         for task_id in task_ids:
             try:
                 self.tasks_manager.get_task_by_id(task_id).is_collapsed = state
@@ -306,15 +308,12 @@ class MainLogic:
                     if state else
                     "она не может быть развернута"
                 )
-                print(f"Задачи с ID {task_id} нет, поэтому {reason}")
+                errors.append(f"Задачи с ID {task_id} нет, поэтому {reason}")
             else:
                 self.tasks_manager.commit()
-                at_least_one_task_is_changed = True
-        if at_least_one_task_is_changed:
-            if self.settings.get_auto_showing_state():
-                self.print_tasks()
+        return "\n".join(errors) if errors else None
 
-    def add_task(self, parent_id: int, text: str) -> None:
+    def add_task(self, parent_id: int, text: str) -> Optional[str]:
         if (
             parent_id is None
             or
@@ -325,124 +324,134 @@ class MainLogic:
             task = orm_classes.Task(text=text, parent_id=parent_id)
             self.tasks_manager.append(task)
             self.tasks_manager.commit()
-            if self.settings.get_auto_showing_state():
-                self.print_tasks()
         else:
-            print(
+            return (
                 f"Задачи с ID {parent_id} нет, поэтому новая задача не может "
                 f"быть создана"
             )
 
-    def edit_task(self, task_id: int, text: str) -> None:
+    def edit_task(self, task_id: int, text: str) -> Optional[str]:
         try:
             task = self.tasks_manager.get_task_by_id(task_id)
         except NoResultFound:
-            print(
+            return (
                 f"Задачи с ID {task_id} нет, поэтому она не может быть "
                 f"изменена!"
             )
         else:
             task.text = text
             self.tasks_manager.commit()
-            if self.settings.get_auto_showing_state():
-                self.print_tasks()
 
-    def delete_tasks(self, task_ids: Tuple[int]) -> None:
-        at_least_one_task_is_deleted = False
+    def delete_tasks(self, task_ids: Tuple[int]) -> Optional[str]:
+        errors = []
         for task_id in task_ids:
             try:
                 self.tasks_manager.delete(
                     self.tasks_manager.get_task_by_id(task_id)
                 )
             except NoResultFound:
-                print(
+                errors.append(
                     f"Задачи с ID {task_id} нет, поэтому она не может быть "
                     f"удалена"
                 )
             else:
                 self.tasks_manager.commit()
-                at_least_one_task_is_deleted = True
-        if at_least_one_task_is_deleted:
-            if self.settings.get_auto_showing_state():
-                self.print_tasks()
+        return "\n".join(errors) if errors else None
 
-    def show_help_message(self) -> None:
-        print("\n\n".join(
+    def get_help_message(self) -> str:
+        return "\n\n".join(
             [
                 command.get_full_description(include_heading=True)
                 for command in self.commands
             ]
-        ))
+        )
 
-    def show_help_message_for_specific_commands(
-            self, command_names: Tuple[str]) -> None:
-        commands_info = []
+    def get_help_message_for_specific_commands(
+            self, command_names: Tuple[str]) -> str:
+        help_messages = []
         for command_name in command_names:
             for command in self.commands:
                 if command_name in command.names:
-                    commands_info.append(
+                    help_messages.append(
                         command.get_full_description(include_heading=True)
                     )
-        print("\n\n".join(commands_info))
+        return (
+            "\n\n".join(help_messages)
+            if help_messages else
+            "Ни одна указанная команда не найдена!"
+        )
 
-    def change_auto_showing(self, state: bool) -> None:
-        print(
+    def change_auto_showing(self, state: bool) -> str:
+        self.settings["auto_showing"] = str(state)
+        self.settings.save()
+        return (
             "Автопоказ дерева задач после каждой команды теперь "
             f"{'включен' if state else 'выключен'}"
         )
-        self.settings["auto_showing"] = str(state)
-        self.settings.save()
 
-    def print_tasks(self) -> None:
-        root_tasks = self.tasks_manager.get_root_tasks()
+    def get_tasks_as_string(
+            self,
+            root_tasks: List[orm_classes.Task],
+            indent_size: int = 4,
+            indentation_symbol: str = " ") -> str:
         if root_tasks:
-            print(
-                "\n".join(
-                    self.get_all_tasks_as_strings(
-                        root_tasks
-                    )
+            return "\n".join(
+                self.get_tasks_as_strings(
+                    root_tasks,
+                    indent_size=indent_size,
+                    indentation_symbol=indentation_symbol
                 )
             )
         else:
-            print("<дерево пустое>")
+            return "<дерево пустое>"
 
     def listen_for_commands_infinitely(self) -> NoReturn:
         while True:
             entered_command = input(">>> ")
-            for command in self.commands:
-                try:
-                    command.attached_function(
-                        *command.convert_command_to_args(entered_command)
-                    )
-                except exceptions.ParsingError:
-                    pass
-                else:
-                    break
+            result = self.handle_command(entered_command)
+            if result is None:
+                if self.settings.get_auto_showing_state():
+                    print(self.get_local_tasks_as_string())
             else:
-                print("Что?")
+                print(result)
 
-    def get_all_tasks_as_strings(
+    def handle_command(self, command: str) -> Optional[str]:
+        for command_ in self.commands:
+            try:
+                result: Optional[str] = command_.attached_function(
+                    *command_.convert_command_to_args(command)
+                )
+            except exceptions.ParsingError:
+                pass
+            else:
+                return result
+        return "Что?"
+
+    def get_tasks_as_strings(
             self,
             root_tasks: List[orm_classes.Task],
             indentation_level: int = 0,
             indent_size: int = 4,
             indentation_symbol: str = " ") -> List[str]:
+        tasks_as_strings = []
         for task in root_tasks:
-            task_as_str = (
+            tasks_as_strings.append(
                 f"{indentation_symbol * (indentation_level * indent_size)}"
                 f"[{'+' if task.is_collapsed else '-'}]"
                 f"[{'X' if task.is_checked else ' '}]"
                 f"[ID: {task.id}]"
                 f" {task.text}"
             )
-            yield task_as_str
             if not task.is_collapsed and task.nested_tasks:
-                yield from self.get_all_tasks_as_strings(
-                    task.nested_tasks,
-                    indentation_level + 1,
-                    indent_size,
-                    indentation_symbol
+                tasks_as_strings.extend(
+                    self.get_tasks_as_strings(
+                        task.nested_tasks,
+                        indentation_level + 1,
+                        indent_size,
+                        indentation_symbol
+                    )
                 )
+        return tasks_as_strings
 
 
 if __name__ == '__main__':
