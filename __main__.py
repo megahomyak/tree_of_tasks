@@ -1,12 +1,11 @@
 import functools
 from configparser import ConfigParser
-from typing import NoReturn, Tuple, List, Optional
-
-from sqlalchemy.orm.exc import NoResultFound
+from typing import NoReturn, Optional
 
 import dataclasses_
 import exceptions
-from orm import db_apis, orm_classes
+import handlers
+from orm import db_apis
 from scripts_for_settings.default_fields_for_settings_file import (
     DEFAULT_FIELDS_FOR_SETTINGS
 )
@@ -30,23 +29,30 @@ class MainLogic:
             dataclasses_.Command(
                 ("автопоказ", "autoshowing"),
                 "включает/выключает показ дерева задач после каждого изменения",
-                self.change_auto_showing,
+                handlers.change_auto_showing,
                 (
                     dataclasses_.Arg(
                         "состояние настройки",
                         dataclasses_.BoolArgType()
                     ),
+                ),
+                (
+                    dataclasses_.INIWorkerMetadata,
                 )
             ),
             dataclasses_.Command(
                 ("помощь", "команды", "help", "commands"),
                 "показывает список команд",
-                self.get_help_message
+                handlers.get_help_message,
+                (),
+                (
+                    dataclasses_.CommandsMetadata,
+                )
             ),
             dataclasses_.Command(
                 ("помощь", "команды", "help", "commands"),
                 "показывает помощь по конкретным командам",
-                self.get_help_message_for_specific_commands,
+                handlers.get_help_message_for_specific_commands,
                 (
                     dataclasses_.Arg(
                         "названия команд",
@@ -60,6 +66,9 @@ class MainLogic:
                             "использовать еще и любой псевдоним этой команды"
                         )
                     ),
+                ),
+                (
+                    dataclasses_.CommandsMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -68,7 +77,7 @@ class MainLogic:
                     "добавляет задачу с указанным "
                     "родителем (необязательно) и текстом"
                 ),
-                self.add_task,
+                handlers.add_task,
                 (
                     dataclasses_.Arg(
                         "ID родителя",
@@ -79,17 +88,24 @@ class MainLogic:
                         "текст новой задачи",
                         dataclasses_.StringArgType()
                     )
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
                 ("показать", "show", "дерево", "tree"),
                 "выводит в консоль дерево задач",
-                self.get_tasks_as_string
+                handlers.get_tasks_as_string,
+                (),
+                (
+                    dataclasses_.RootTasksMetadata,
+                )
             ),
             dataclasses_.Command(
                 ("удалить", "delete", "del", "-", "remove", "убрать", "rm"),
                 "удаляет задачу с указанным ID",
-                self.delete_tasks,
+                handlers.delete_tasks,
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно удалить",
@@ -101,6 +117,9 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -109,7 +128,7 @@ class MainLogic:
                     "check", "mark", "complete", "x", "х", "X", "Х"
                 ),
                 "помечает задачи как выполненные",
-                functools.partial(self.change_checked_state, True),
+                functools.partial(handlers.change_checked_state, True),
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно пометить выполненными",
@@ -121,12 +140,15 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
                 ("убрать метку", "снять метку", "uncheck"),
                 "помечает задачи как невыполненные",
-                functools.partial(self.change_checked_state, False),
+                functools.partial(handlers.change_checked_state, False),
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно пометить невыполненными",
@@ -138,6 +160,9 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -146,7 +171,7 @@ class MainLogic:
                     "сворачивает задачу, так что все дочерние задачи не будут "
                     "видны"
                 ),
-                functools.partial(self.change_collapsing_state, True),
+                functools.partial(handlers.change_collapsing_state, True),
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно свернуть",
@@ -158,6 +183,9 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -166,7 +194,7 @@ class MainLogic:
                     "разворачивает задачу, так что все дочерние задачи будут "
                     "видны"
                 ),
-                functools.partial(self.change_collapsing_state, False),
+                functools.partial(handlers.change_collapsing_state, False),
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно свернуть",
@@ -178,6 +206,9 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -186,7 +217,7 @@ class MainLogic:
                     "change", "edit"
                 ),
                 "изменяет текст указанной задачи",
-                self.edit_task,
+                handlers.edit_task,
                 (
                     dataclasses_.Arg(
                         "ID задачи",
@@ -196,6 +227,9 @@ class MainLogic:
                         "текст задачи",
                         dataclasses_.StringArgType()
                     )
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -210,7 +244,7 @@ class MainLogic:
                     "ID родителя может быть пропущено (-), тогда задача "
                     "станет корневой"
                 ),
-                self.change_parent_of_task,
+                handlers.change_parent_of_task,
                 (
                     dataclasses_.Arg(
                         "ID задачи",
@@ -220,190 +254,31 @@ class MainLogic:
                         "ID нового родителя",
                         dataclasses_.OptionalIntArgType()
                     )
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
                 ("дата", "date", "time", "время"),
                 "показывает дату (и время) создания задачи",
-                self.show_date,
+                handlers.show_date,
                 (
                     dataclasses_.Arg(
                         "ID задачи",
                         dataclasses_.IntArgType()
                     ),
+                ),
+                (
+                    dataclasses_.TasksManagerMetadata,
                 )
             )
         )
 
     def get_local_tasks_as_string(self):
-        return self.get_tasks_as_string(self.tasks_manager.get_root_tasks())
-
-    def show_date(self, task_id: int) -> str:
-        try:
-            task = self.tasks_manager.get_task_by_id(task_id)
-        except NoResultFound:
-            return (
-                f"Задачи с ID {task_id} нет, поэтому невозможно узнать дату ее "
-                f"создания!"
-            )
-        else:
-            return f"Дата создания задачи с ID {task_id}: {task.creation_date}"
-
-    def change_parent_of_task(
-            self, task_id: int, parent_id: int) -> Optional[str]:
-        try:
-            task = self.tasks_manager.get_task_by_id(task_id)
-        except NoResultFound:
-            return (
-                f"Задачи с ID {task_id} нет, поэтому она не может быть "
-                f"изменена!"
-            )
-        else:
-            if task_id == parent_id:
-                return (
-                    f"Задача не может быть родителем самой себя! "
-                    f"({task_id} == {parent_id})"
-                )
-            else:
-                if (
-                    parent_id is None
-                    or
-                    self.tasks_manager.check_existence(
-                        orm_classes.Task.id == parent_id
-                    )
-                ):
-                    task.parent_id = parent_id
-                    self.tasks_manager.commit()
-                else:
-                    return f"Задачи с ID {parent_id} нет!"
-
-    def change_checked_state(
-            self, state: bool,
-            task_ids: Tuple[int]) -> Optional[str]:
-        errors = []
-        for task_id in task_ids:
-            try:
-                self.tasks_manager.get_task_by_id(task_id).is_checked = state
-            except NoResultFound:
-                reason = (
-                    "она не может быть помечена"
-                    if state else
-                    "с нее нельзя убрать метку"
-                )
-                errors.append(f"Задачи с ID {task_id} нет, поэтому {reason}")
-            else:
-                self.tasks_manager.commit()
-        return "\n".join(errors) if errors else None
-
-    def change_collapsing_state(
-            self, state: bool,
-            task_ids: Tuple[int]) -> Optional[str]:
-        errors = []
-        for task_id in task_ids:
-            try:
-                self.tasks_manager.get_task_by_id(task_id).is_collapsed = state
-            except NoResultFound:
-                reason = (
-                    "она не может быть свернута"
-                    if state else
-                    "она не может быть развернута"
-                )
-                errors.append(f"Задачи с ID {task_id} нет, поэтому {reason}")
-            else:
-                self.tasks_manager.commit()
-        return "\n".join(errors) if errors else None
-
-    def add_task(self, parent_id: int, text: str) -> Optional[str]:
-        if (
-            parent_id is None
-            or
-            self.tasks_manager.check_existence(
-                orm_classes.Task.id == parent_id
-            )
-        ):
-            task = orm_classes.Task(text=text, parent_id=parent_id)
-            self.tasks_manager.append(task)
-            self.tasks_manager.commit()
-        else:
-            return (
-                f"Задачи с ID {parent_id} нет, поэтому новая задача не может "
-                f"быть создана"
-            )
-
-    def edit_task(self, task_id: int, text: str) -> Optional[str]:
-        try:
-            task = self.tasks_manager.get_task_by_id(task_id)
-        except NoResultFound:
-            return (
-                f"Задачи с ID {task_id} нет, поэтому она не может быть "
-                f"изменена!"
-            )
-        else:
-            task.text = text
-            self.tasks_manager.commit()
-
-    def delete_tasks(self, task_ids: Tuple[int]) -> Optional[str]:
-        errors = []
-        for task_id in task_ids:
-            try:
-                self.tasks_manager.delete(
-                    self.tasks_manager.get_task_by_id(task_id)
-                )
-            except NoResultFound:
-                errors.append(
-                    f"Задачи с ID {task_id} нет, поэтому она не может быть "
-                    f"удалена"
-                )
-            else:
-                self.tasks_manager.commit()
-        return "\n".join(errors) if errors else None
-
-    def get_help_message(self) -> str:
-        return "\n\n".join(
-            [
-                command.get_full_description(include_heading=True)
-                for command in self.commands
-            ]
+        return handlers.get_tasks_as_string(
+            self.tasks_manager.get_root_tasks()
         )
-
-    def get_help_message_for_specific_commands(
-            self, command_names: Tuple[str]) -> str:
-        help_messages = []
-        for command_name in command_names:
-            for command in self.commands:
-                if command_name in command.names:
-                    help_messages.append(
-                        command.get_full_description(include_heading=True)
-                    )
-        return (
-            "\n\n".join(help_messages)
-            if help_messages else
-            "Ни одна указанная команда не найдена!"
-        )
-
-    def change_auto_showing(self, state: bool) -> str:
-        self.settings["auto_showing"] = str(state)
-        self.settings.save()
-        return (
-            "Автопоказ дерева задач после каждой команды теперь "
-            f"{'включен' if state else 'выключен'}"
-        )
-
-    def get_tasks_as_string(
-            self,
-            root_tasks: List[orm_classes.Task],
-            indent_size: int = 4,
-            indentation_symbol: str = " ") -> str:
-        if root_tasks:
-            return "\n".join(
-                self.get_tasks_as_strings(
-                    root_tasks,
-                    indent_size=indent_size,
-                    indentation_symbol=indentation_symbol
-                )
-            )
-        else:
-            return "<дерево пустое>"
 
     def listen_for_commands_infinitely(self) -> NoReturn:
         while True:
@@ -416,9 +291,15 @@ class MainLogic:
                 print(result)
 
     def handle_command(self, command: str) -> Optional[str]:
+        context = dataclasses_.Context(
+            self.tasks_manager,
+            self.settings,
+            self.commands
+        )
         for command_ in self.commands:
             try:
                 result: Optional[str] = command_.attached_function(
+                    *command_.get_all_metadata_as_converted(context),
                     *command_.convert_command_to_args(command)
                 )
             except exceptions.ParsingError:
@@ -426,32 +307,6 @@ class MainLogic:
             else:
                 return result
         return "Что?"
-
-    def get_tasks_as_strings(
-            self,
-            root_tasks: List[orm_classes.Task],
-            indentation_level: int = 0,
-            indent_size: int = 4,
-            indentation_symbol: str = " ") -> List[str]:
-        tasks_as_strings = []
-        for task in root_tasks:
-            tasks_as_strings.append(
-                f"{indentation_symbol * (indentation_level * indent_size)}"
-                f"[{'+' if task.is_collapsed else '-'}]"
-                f"[{'X' if task.is_checked else ' '}]"
-                f"[ID: {task.id}]"
-                f" {task.text}"
-            )
-            if not task.is_collapsed and task.nested_tasks:
-                tasks_as_strings.extend(
-                    self.get_tasks_as_strings(
-                        task.nested_tasks,
-                        indentation_level + 1,
-                        indent_size,
-                        indentation_symbol
-                    )
-                )
-        return tasks_as_strings
 
 
 if __name__ == '__main__':
