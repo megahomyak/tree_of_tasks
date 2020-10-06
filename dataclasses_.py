@@ -29,10 +29,13 @@ class BaseArgType(ABC):
     @abstractmethod
     def convert(self, arg: str) -> Any:
         """
-        Checks if some value corresponds to the argument type described by class
+        Converts incoming argument to the corresponding type
+
+        Args:
+            arg: str with some argument
 
         Returns:
-            bool - check passed or not
+            arg converted to some type
         """
         pass
 
