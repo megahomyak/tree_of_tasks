@@ -18,7 +18,7 @@ def change_auto_showing(settings: MyINIWorker, new_state: bool) -> str:
     )
 
 
-def get_help_message(commands: List[dataclasses_.Command]) -> str:
+def get_help_message(commands: Tuple[dataclasses_.Command]) -> str:
     return "\n\n".join(
         [
             command.get_full_description(include_heading=True)
@@ -28,7 +28,8 @@ def get_help_message(commands: List[dataclasses_.Command]) -> str:
 
 
 def get_help_message_for_specific_commands(
-        commands: List[dataclasses_.Command], command_names: Tuple[str]) -> str:
+        commands: Tuple[dataclasses_.Command],
+        command_names: Tuple[str]) -> str:
     help_messages = []
     for command_name in command_names:
         for command in commands:
