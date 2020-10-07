@@ -31,20 +31,19 @@ class MainLogic:
                 "включает/выключает показ дерева задач после каждого изменения",
                 handlers.change_auto_showing,
                 (
+                    dataclasses_.INIWorkerMetadata,
+                ),
+                (
                     dataclasses_.Arg(
                         "состояние настройки",
                         dataclasses_.BoolArgType()
                     ),
-                ),
-                (
-                    dataclasses_.INIWorkerMetadata,
                 )
             ),
             dataclasses_.Command(
                 ("помощь", "команды", "help", "commands"),
                 "показывает список команд",
                 handlers.get_help_message,
-                (),
                 (
                     dataclasses_.CommandsMetadata,
                 )
@@ -53,6 +52,9 @@ class MainLogic:
                 ("помощь", "команды", "help", "commands"),
                 "показывает помощь по конкретным командам",
                 handlers.get_help_message_for_specific_commands,
+                (
+                    dataclasses_.CommandsMetadata,
+                ),
                 (
                     dataclasses_.Arg(
                         "названия команд",
@@ -66,9 +68,6 @@ class MainLogic:
                             "использовать еще и любой псевдоним этой команды"
                         )
                     ),
-                ),
-                (
-                    dataclasses_.CommandsMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -79,6 +78,9 @@ class MainLogic:
                 ),
                 handlers.add_task,
                 (
+                    dataclasses_.TasksManagerMetadata,
+                ),
+                (
                     dataclasses_.Arg(
                         "ID родителя",
                         dataclasses_.OptionalIntArgType(),
@@ -88,16 +90,12 @@ class MainLogic:
                         "текст новой задачи",
                         dataclasses_.StringArgType()
                     )
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
                 ("показать", "show", "дерево", "tree"),
                 "выводит в консоль дерево задач",
                 handlers.get_tasks_as_string,
-                (),
                 (
                     dataclasses_.RootTasksMetadata,
                 )
@@ -106,6 +104,9 @@ class MainLogic:
                 ("удалить", "delete", "del", "-", "remove", "убрать", "rm"),
                 "удаляет задачу с указанным ID",
                 handlers.delete_tasks,
+                (
+                    dataclasses_.TasksManagerMetadata,
+                ),
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно удалить",
@@ -117,9 +118,6 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -129,6 +127,9 @@ class MainLogic:
                 ),
                 "помечает задачи как выполненные",
                 functools.partial(handlers.change_checked_state, True),
+                (
+                    dataclasses_.TasksManagerMetadata,
+                ),
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно пометить выполненными",
@@ -140,15 +141,15 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
                 ("убрать метку", "снять метку", "uncheck"),
                 "помечает задачи как невыполненные",
                 functools.partial(handlers.change_checked_state, False),
+                (
+                    dataclasses_.TasksManagerMetadata,
+                ),
                 (
                     dataclasses_.Arg(
                         "ID задач, которые нужно пометить невыполненными",
@@ -160,9 +161,6 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -173,6 +171,9 @@ class MainLogic:
                 ),
                 functools.partial(handlers.change_collapsing_state, True),
                 (
+                    dataclasses_.TasksManagerMetadata,
+                ),
+                (
                     dataclasses_.Arg(
                         "ID задач, которые нужно свернуть",
                         dataclasses_.SequenceArgType(
@@ -183,9 +184,6 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -196,6 +194,9 @@ class MainLogic:
                 ),
                 functools.partial(handlers.change_collapsing_state, False),
                 (
+                    dataclasses_.TasksManagerMetadata,
+                ),
+                (
                     dataclasses_.Arg(
                         "ID задач, которые нужно свернуть",
                         dataclasses_.SequenceArgType(
@@ -206,9 +207,6 @@ class MainLogic:
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -219,6 +217,9 @@ class MainLogic:
                 "изменяет текст указанной задачи",
                 handlers.edit_task,
                 (
+                    dataclasses_.TasksManagerMetadata,
+                ),
+                (
                     dataclasses_.Arg(
                         "ID задачи",
                         dataclasses_.IntArgType()
@@ -227,9 +228,6 @@ class MainLogic:
                         "текст задачи",
                         dataclasses_.StringArgType()
                     )
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -246,6 +244,9 @@ class MainLogic:
                 ),
                 handlers.change_parent_of_task,
                 (
+                    dataclasses_.TasksManagerMetadata,
+                ),
+                (
                     dataclasses_.Arg(
                         "ID задачи",
                         dataclasses_.IntArgType()
@@ -254,9 +255,6 @@ class MainLogic:
                         "ID нового родителя",
                         dataclasses_.OptionalIntArgType()
                     )
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             ),
             dataclasses_.Command(
@@ -264,13 +262,13 @@ class MainLogic:
                 "показывает дату (и время) создания задачи",
                 handlers.show_date,
                 (
+                    dataclasses_.TasksManagerMetadata,
+                ),
+                (
                     dataclasses_.Arg(
                         "ID задачи",
                         dataclasses_.IntArgType()
                     ),
-                ),
-                (
-                    dataclasses_.TasksManagerMetadata,
                 )
             )
         )

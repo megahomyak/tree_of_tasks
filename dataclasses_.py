@@ -247,8 +247,8 @@ class Command:
     names: Tuple[str, ...]
     description: str
     attached_function: Callable
-    arguments: Tuple[Arg, ...] = ()
     metadata_tuple: Tuple[Type[BaseMetadata], ...] = ()
+    arguments: Tuple[Arg, ...] = ()
 
     def convert_command_to_args(self, command: str) -> Tuple[Any, ...]:
         rgx_result = re.fullmatch(
