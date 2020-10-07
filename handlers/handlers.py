@@ -3,6 +3,7 @@ from typing import Tuple, Optional, List
 from sqlalchemy.orm.exc import NoResultFound
 
 import dataclasses_
+from handlers import handler_helpers
 from orm import orm_classes
 from orm.db_apis import TasksManager
 from scripts_for_settings.ini_worker import MyINIWorker
@@ -62,39 +63,13 @@ def add_task(
         )
 
 
-def get_tasks_as_strings(
-        root_tasks: List[orm_classes.Task],
-        indentation_level: int = 0,
-        indent_size: int = 4,
-        indentation_symbol: str = " ") -> List[str]:
-    tasks_as_strings = []
-    for task in root_tasks:
-        tasks_as_strings.append(
-            f"{indentation_symbol * (indentation_level * indent_size)}"
-            f"[{'+' if task.is_collapsed else '-'}]"
-            f"[{'X' if task.is_checked else ' '}]"
-            f"[ID: {task.id}]"
-            f" {task.text}"
-        )
-        if not task.is_collapsed and task.nested_tasks:
-            tasks_as_strings.extend(
-                get_tasks_as_strings(
-                    task.nested_tasks,
-                    indentation_level + 1,
-                    indent_size,
-                    indentation_symbol
-                )
-            )
-    return tasks_as_strings
-
-
 def get_tasks_as_string(
         root_tasks: List[orm_classes.Task],
         indent_size: int = 4,
         indentation_symbol: str = " ") -> str:
     if root_tasks:
         return "\n".join(
-            get_tasks_as_strings(
+            handler_helpers.get_tasks_as_strings(
                 root_tasks,
                 indent_size=indent_size,
                 indentation_symbol=indentation_symbol

@@ -4,7 +4,7 @@ from typing import NoReturn, Optional
 
 import dataclasses_
 import exceptions
-import handlers
+from handlers import handlers
 from orm import db_apis
 from scripts_for_settings.default_fields_for_settings_file import (
     DEFAULT_FIELDS_FOR_SETTINGS
