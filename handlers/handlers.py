@@ -3,7 +3,7 @@ from typing import Tuple, Optional, List
 from sqlalchemy.orm.exc import NoResultFound
 
 import dataclasses_
-from handlers import handler_helpers
+from handlers import handler_helpers, chain_of_responsibility_checks as checks
 from orm import orm_classes
 from orm.db_apis import TasksManager
 from scripts_for_settings.ini_worker import MyINIWorker
@@ -152,32 +152,33 @@ def edit_task(
 
 def change_parent_of_task(
         tasks_manager: TasksManager,
-        task_id: int, parent_id: int) -> Optional[str]:
-    try:
-        task = tasks_manager.get_task_by_id(task_id)
-    except NoResultFound:
-        return (
-            f"Задачи с ID {task_id} нет, поэтому она не может быть "
-            f"изменена!"
-        )
-    else:
-        if task_id == parent_id:
-            return (
-                f"Задача не может быть родителем самой себя! "
-                f"({task_id} == {parent_id})"
+        parent_id: int, task_ids: Tuple[int]) -> Optional[str]:
+    errors = []
+    for task_id in task_ids:
+        try:
+            task = tasks_manager.get_task_by_id(task_id)
+        except NoResultFound:
+            errors.append(
+                f"Задачи с ID {task_id} нет, поэтому она не может быть "
+                f"изменена!"
             )
         else:
-            if (
-                parent_id is None
-                or
-                tasks_manager.check_existence(
-                    orm_classes.Task.id == parent_id
+            try:
+                checks.parent_id_is_equal_to_the_current_task_id(
+                    task, parent_id
                 )
-            ):
+                checks.parent_id_exists(
+                    tasks_manager, parent_id, task
+                )
+                checks.check_for_subtask(
+                    task, parent_id
+                )
+            except checks.ValidationError as error:
+                errors.append(str(error))
+            else:
                 task.parent_id = parent_id
                 tasks_manager.commit()
-            else:
-                return f"Задачи с ID {parent_id} нет!"
+    return "\n".join(errors) if errors else None
 
 
 def show_date(tasks_manager: TasksManager, task_id: int) -> str:

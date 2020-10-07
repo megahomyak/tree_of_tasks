@@ -234,13 +234,15 @@ class MainLogic:
                 (
                     "изменить ID родителя", "change parent ID",
                     "отредактировать ID родителя", "edit parent ID",
-                    "установить ID родителя", "set parent ID"
+                    "установить ID родителя", "set parent ID",
+                    "adopt", "усыновить"
                 ),
                 (
-                    "изменяет ID родителя указанной задачи (задача "
-                    "\"переезжает\" в дочерние к другой задаче); "
-                    "ID родителя может быть пропущено (-), тогда задача "
-                    "станет корневой"
+                    "изменяет ID родителя указанных задач (задачи "
+                    "\"переезжают\" в дочерние к другой задаче); "
+                    "ID родителя может быть пропущено (-), тогда задачи "
+                    "станут корневыми; задачи нужно прописывать через запятую "
+                    "без пробела"
                 ),
                 handlers.change_parent_of_task,
                 (
@@ -248,12 +250,16 @@ class MainLogic:
                 ),
                 (
                     dataclasses_.Arg(
-                        "ID задачи",
-                        dataclasses_.IntArgType()
+                        "ID нового родителя",
+                        dataclasses_.OptionalIntArgType(),
+                        "к кому переезжает"
                     ),
                     dataclasses_.Arg(
-                        "ID нового родителя",
-                        dataclasses_.OptionalIntArgType()
+                        "ID задач",
+                        dataclasses_.SequenceArgType(
+                            dataclasses_.IntArgType()
+                        ),
+                        "что переезжает"
                     )
                 )
             ),
