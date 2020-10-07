@@ -18,7 +18,6 @@ class Task(DeclarativeBase):
     is_collapsed = Column(Boolean, default=False, nullable=False)
     parent_id = Column(Integer, ForeignKey("tasks.id"), default=None)
     creation_date = Column(DateTime, default=datetime.now)
-    creator_vk_id = Column(Integer)
 
     nested_tasks: List["Task"] = relationship(
         "Task", cascade="save-update, delete"
@@ -43,12 +42,3 @@ class Task(DeclarativeBase):
             if task.check_for_subtask(subtask_id):
                 return True
         return False
-
-
-class UserSettings:
-
-    __tablename__ = "user_settings"
-
-    id = Column(Integer, primary_key=True)
-    auto_showing = Column(Boolean, nullable=False, default=True)
-    user_vk_id = Column(Integer)
