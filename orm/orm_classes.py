@@ -31,3 +31,11 @@ class Task(DeclarativeBase):
         for task in self.nested_tasks:
             task.set_is_checked_to(state)
         self.is_checked = state
+
+    def check_for_subtask(self, subtask_id: int) -> bool:
+        if subtask_id in (task.id for task in self.nested_tasks):
+            return True
+        for task in self.nested_tasks:
+            if task.check_for_subtask(subtask_id):
+                return True
+        return False
