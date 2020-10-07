@@ -47,11 +47,11 @@ def add_task(
         tasks_manager: TasksManager, parent_id: int,
         text: str) -> Optional[str]:
     if (
-            parent_id is None
-            or
-            tasks_manager.check_existence(
-                orm_classes.Task.id == parent_id
-            )
+        parent_id is None
+        or
+        tasks_manager.check_existence(
+            orm_classes.Task.id == parent_id
+        )
     ):
         task = orm_classes.Task(text=text, parent_id=parent_id)
         tasks_manager.append(task)
@@ -167,11 +167,11 @@ def change_parent_of_task(
             )
         else:
             if (
-                    parent_id is None
-                    or
-                    tasks_manager.check_existence(
-                        orm_classes.Task.id == parent_id
-                    )
+                parent_id is None
+                or
+                tasks_manager.check_existence(
+                    orm_classes.Task.id == parent_id
+                )
             ):
                 task.parent_id = parent_id
                 tasks_manager.commit()
