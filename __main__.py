@@ -302,14 +302,14 @@ class MainLogic:
         )
         for command_ in self.commands:
             try:
-                result: Optional[str] = command_.attached_function(
-                    *command_.get_all_metadata_as_converted(context),
-                    *command_.convert_command_to_args(command)
-                )
+                command_args = command_.convert_command_to_args(command)
             except exceptions.ParsingError:
                 pass
             else:
-                return result
+                return command_.attached_function(
+                    *command_.get_all_metadata_as_converted(context),
+                    *command_args
+                )
         return "Что?"
 
 
