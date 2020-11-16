@@ -8,9 +8,9 @@ class INIWorker:
 
     def __init__(
             self, config_parser: ConfigParser,
-            filepath: str, default_section: str = "DEFAULT") -> None:
+            file_path: str, default_section: str = "DEFAULT") -> None:
         self.config_parser = config_parser
-        self.file_path = filepath
+        self.file_path = file_path
         self.default_section = default_section
 
     def load(self, file_path: Optional[str] = None) -> None:
@@ -159,9 +159,9 @@ class MyINIWorker(INIWorker):
 
     def __init__(
             self, config_parser: ConfigParser,
-            filepath: str, default_section: str = "DEFAULT"):
+            file_path: str, default_section: str = "DEFAULT"):
         super(MyINIWorker, self).__init__(
-            config_parser, filepath, default_section
+            config_parser, file_path, default_section
         )
 
     def get_auto_showing_state(self) -> bool:
