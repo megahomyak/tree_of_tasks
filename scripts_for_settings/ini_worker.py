@@ -1,7 +1,7 @@
 from configparser import ConfigParser, SectionProxy
 from typing import Optional, Any, Tuple, Dict, Union
 
-from types_converter import TypesConverter
+import type_converters
 
 
 class INIWorker:
@@ -159,12 +159,10 @@ class MyINIWorker(INIWorker):
 
     def __init__(
             self, config_parser: ConfigParser,
-            filepath: str, types_converter: TypesConverter,
-            default_section: str = "DEFAULT"):
+            filepath: str, default_section: str = "DEFAULT"):
         super(MyINIWorker, self).__init__(
             config_parser, filepath, default_section
         )
-        self.types_converter = types_converter
 
     def get_auto_showing_state(self) -> bool:
-        return self.types_converter.str_to_bool(self["auto_showing"])
+        return type_converters.str_to_bool(self["auto_showing"])

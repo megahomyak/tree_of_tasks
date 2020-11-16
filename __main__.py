@@ -10,7 +10,6 @@ from scripts_for_settings.default_fields_for_settings_file import (
     DEFAULT_FIELDS_FOR_SETTINGS
 )
 from scripts_for_settings.ini_worker import MyINIWorker
-from types_converter import TypesConverter
 
 
 class MainLogic:
@@ -320,8 +319,7 @@ if __name__ == '__main__':
         ),
         MyINIWorker(
             ConfigParser(),
-            "tree_of_tasks_config.ini",
-            TypesConverter()
+            "tree_of_tasks_config.ini"
         )
     )
     main_logic.listen_for_commands_infinitely()
