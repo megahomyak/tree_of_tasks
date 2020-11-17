@@ -3,7 +3,7 @@ from typing import Tuple, Optional, List
 from sqlalchemy.orm.exc import NoResultFound
 
 import dataclasses_
-from handlers import handler_helpers, chain_of_responsibility_checks as checks
+from handlers import handler_helpers
 from orm import models
 from orm.db_apis import TasksManager
 from scripts_for_settings.ini_worker import MyINIWorker
@@ -165,18 +165,22 @@ def change_parent_of_task(
                 f"изменена!"
             )
         else:
-            try:
-                checks.parent_id_is_equal_to_the_current_task_id(
-                    task, parent_id
+            if task_id == parent_id:
+                errors.append(
+                    f"Задача не может быть родителем самой себя! "
+                    f"({task.id} == {parent_id})"
                 )
-                checks.parent_id_exists(
-                    tasks_manager, parent_id, task
+            elif (
+                parent_id is not None
+                and tasks_manager.check_existence(task.id == parent_id)
+            ):
+                errors.append(f"Задачи с ID {parent_id} нет!")
+            elif parent_id and task.check_for_subtask(parent_id):
+                errors.append(
+                    f"Задача {parent_id} не может быть родителем задачи "
+                    f"{task.id}, так как задача {task.id} содержит задачу "
+                    f"{parent_id} как дочернюю"
                 )
-                checks.check_for_subtask(
-                    task, parent_id
-                )
-            except checks.ValidationError as error:
-                errors.append(str(error))
             else:
                 task.parent_id = parent_id
                 tasks_manager.commit()
