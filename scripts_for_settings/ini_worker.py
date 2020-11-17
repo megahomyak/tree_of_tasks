@@ -153,12 +153,5 @@ class INIWorker:
 
 class MyINIWorker(INIWorker):
 
-    def __init__(
-            self, config_parser: ConfigParser,
-            file_path: str, default_section: str = "DEFAULT"):
-        super(MyINIWorker, self).__init__(
-            config_parser, file_path, default_section
-        )
-
     def get_auto_showing_state(self) -> bool:
         return type_converters.str_to_bool(self["auto_showing"])
