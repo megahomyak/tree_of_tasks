@@ -13,31 +13,28 @@ class INIWorker:
         self.file_path = file_path
         self.default_section = default_section
 
-    def load(self, file_path: Optional[str] = None) -> None:
-        if file_path is None:
-            file_path = self.file_path
-        self.config_parser.read(file_path)
+    def load(self, file_path: Optional[str] = None) -> bool:
+        """
+        Loads config from file.
+
+        Args:
+            file_path: path to .ini file with config
+
+        Returns:
+            bool - something is loaded or not
+        """
+        with open(self.file_path if file_path is None else file_path, "r") as f:
+            file_contents = f.read()
+        if file_contents:
+            self.load_from_string(file_contents)
+            return True
+        return False
 
     def load_from_string(self, string: str) -> None:
         self.config_parser.read_string(string)
 
     def load_from_dict(self, dict_: Dict[str, Dict[str, Any]]) -> None:
         self.config_parser.read_dict(dict_)
-
-    def load_fields_if_not_exists(
-            self, sections_with_fields: Dict[str, Dict[str, str]]) -> None:
-        """
-        If some field does not exist - create it with the given value.
-
-        Args:
-            sections_with_fields: dict like {section_name: {field: value}}
-        """
-        for section_name, section_contents in sections_with_fields.items():
-            if section_name not in self.config_parser:
-                self.config_parser[section_name] = {}
-            for key, value in section_contents.items():
-                if key not in self.config_parser[section_name]:
-                    self[section_name, key] = value
 
     def save(self, file_path: Optional[str] = None) -> None:
         """
@@ -48,9 +45,7 @@ class INIWorker:
             file_path:
                 path to the file, where config parser info should be saved
         """
-        if file_path is None:
-            file_path = self.file_path
-        with open(file_path, "w") as f:
+        with open(self.file_path if file_path is None else file_path, "w") as f:
             self.config_parser.write(f)
 
     def as_str(self) -> str:

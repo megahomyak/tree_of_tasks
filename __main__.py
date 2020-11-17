@@ -6,9 +6,6 @@ import dataclasses_
 import exceptions
 from handlers import handlers
 from orm import db_apis
-from scripts_for_settings.default_fields_for_settings_file import (
-    DEFAULT_FIELDS_FOR_SETTINGS
-)
 from scripts_for_settings.ini_worker import MyINIWorker
 
 
@@ -18,9 +15,12 @@ class MainLogic:
             self, tasks_manager: db_apis.TasksManager,
             ini_worker: MyINIWorker) -> None:
         self.tasks_manager = tasks_manager
-        ini_worker.load()
-        ini_worker.load_fields_if_not_exists(DEFAULT_FIELDS_FOR_SETTINGS)
-        ini_worker.save()
+        if not ini_worker.load():  # If nothing is loaded
+            ini_worker.load_from_string(
+                "[DEFAULT]\n"
+                "auto_showing = True"
+            )
+            ini_worker.save()
         self.settings = ini_worker
         if self.settings.get_auto_showing_state():
             print(self.get_local_tasks_as_string())
