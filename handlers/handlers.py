@@ -104,7 +104,9 @@ def change_checked_state(
     errors = []
     for task_id in task_ids:
         try:
-            tasks_manager.get_task_by_id(task_id).is_checked = state
+            tasks_manager.get_task_by_id(task_id).change_state_recursively(
+                is_checked=state
+            )
         except NoResultFound:
             reason = (
                 "она не может быть помечена"

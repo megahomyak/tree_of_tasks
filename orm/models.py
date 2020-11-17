@@ -23,17 +23,17 @@ class Task(DeclarativeBase):
         "Task", cascade="save-update, delete"
     )
 
-    def set_is_checked_recursively(self, state: bool) -> None:
+    def change_state_recursively(self, is_checked: bool) -> None:
         """
         Changes is_checked attribute of the current task and all of its nested
         tasks to the specified value.
 
         Args:
-            state: state of the current task and nested tasks
+            is_checked: state of the current task and nested tasks
         """
         for task in self.nested_tasks:
-            task.set_is_checked_to(state)
-        self.is_checked = state
+            task.change_state_recursively(is_checked)
+        self.is_checked = is_checked
 
     def check_for_subtask(self, subtask_id: int) -> bool:
         if subtask_id in (task.id for task in self.nested_tasks):
