@@ -138,8 +138,8 @@ class INIWorker:
         self.config_parser[section][name] = str(value)
 
     def get_section(
-            self, name: str, none_on_error: bool = False
-            ) -> Optional[SectionProxy]:
+            self, name: str,
+            none_on_error: bool = False) -> Optional[SectionProxy]:
         if none_on_error:
             try:
                 return self.config_parser[name]

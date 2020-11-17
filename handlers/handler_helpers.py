@@ -18,12 +18,10 @@ def get_tasks_as_strings(
             f" {task.text}"
         )
         if not task.is_collapsed and task.nested_tasks:
-            tasks_as_strings.extend(
-                get_tasks_as_strings(
-                    task.nested_tasks,
-                    indentation_level + 1,
-                    indent_size,
-                    indentation_symbol
-                )
-            )
+            tasks_as_strings.extend(get_tasks_as_strings(
+                task.nested_tasks,
+                indentation_level + 1,
+                indent_size,
+                indentation_symbol
+            ))
     return tasks_as_strings
