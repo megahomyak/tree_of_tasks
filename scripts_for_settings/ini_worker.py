@@ -90,14 +90,10 @@ class INIWorker:
         Returns:
             current state of the config parser as dict
         """
-        return dict(
-            map(
-                lambda section_name, section: (
-                    section_name, dict(section.items())
-                ),
-                self.config_parser.items()
-            )
-        )
+        return dict(map(
+            lambda section_name, section: (section_name, dict(section.items())),
+            self.config_parser.items()
+        ))
 
     def __getitem__(self, section_and_key: Union[Tuple[str, str], str]) -> str:
         """
