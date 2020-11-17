@@ -3,12 +3,12 @@ from typing import List, Any
 import sqlalchemy.orm
 from sqlalchemy import create_engine
 
-from orm import orm_classes
+from orm import models
 
 
 def get_sqlalchemy_db_session(path_to_db: str) -> sqlalchemy.orm.Session:
     sql_engine = create_engine(path_to_db)
-    orm_classes.DeclarativeBase.metadata.create_all(sql_engine)
+    models.DeclarativeBase.metadata.create_all(sql_engine)
     return sqlalchemy.orm.Session(sql_engine)
 
 
@@ -20,29 +20,29 @@ class TasksManager:
     def _get_query(self) -> sqlalchemy.orm.Query:
         return (
             self.db_session
-            .query(orm_classes.Task)
-            .order_by(orm_classes.Task.creation_date)
+            .query(models.Task)
+            .order_by(models.Task.creation_date)
         )
 
-    def get_tasks(self) -> List[orm_classes.Task]:
+    def get_tasks(self) -> List[models.Task]:
         return (
             self.db_session
-            .query(orm_classes.Task)
-            .order_by(orm_classes.Task.creation_date)
+            .query(models.Task)
+            .order_by(models.Task.creation_date)
             .all()
         )
 
-    def append(self, *tasks: orm_classes.Task) -> None:
+    def append(self, *tasks: models.Task) -> None:
         self.db_session.add_all(tasks)
 
     def commit(self) -> None:
         self.db_session.commit()
 
-    def delete(self, *tasks: orm_classes.Task) -> None:
+    def delete(self, *tasks: models.Task) -> None:
         for task in tasks:
             self.db_session.delete(task)
 
-    def get_filtered_tasks(self, *filters: Any) -> List[orm_classes.Task]:
+    def get_filtered_tasks(self, *filters: Any) -> List[models.Task]:
         """
         Gets tasks, which passed the filter(s).
 
@@ -61,7 +61,7 @@ class TasksManager:
             .all()
         )
 
-    def get_root_tasks(self) -> List[orm_classes.Task]:
+    def get_root_tasks(self) -> List[models.Task]:
         """
         Gets all tasks, which have no parent task, aka root tasks.
 
@@ -89,12 +89,12 @@ class TasksManager:
             # I'm not using _get_query here, because it sorts the tasks by
             # creation date
             self.db_session
-            .query(orm_classes.Task)
+            .query(models.Task)
             .filter(*filters)
             .first()
         ) is not None
 
-    def get_task_by_id(self, task_id: int) -> orm_classes.Task:
+    def get_task_by_id(self, task_id: int) -> models.Task:
         """
         Gets task by id, if no tasks are found - raises an exception.
 

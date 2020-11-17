@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import dataclasses_
 from handlers import handler_helpers, chain_of_responsibility_checks as checks
-from orm import orm_classes
+from orm import models
 from orm.db_apis import TasksManager
 from scripts_for_settings.ini_worker import MyINIWorker
 
@@ -51,10 +51,10 @@ def add_task(
         parent_id is None
         or
         tasks_manager.check_existence(
-            orm_classes.Task.id == parent_id
+            models.Task.id == parent_id
         )
     ):
-        task = orm_classes.Task(text=text, parent_id=parent_id)
+        task = models.Task(text=text, parent_id=parent_id)
         tasks_manager.append(task)
         tasks_manager.commit()
     else:
@@ -65,7 +65,7 @@ def add_task(
 
 
 def get_tasks_as_string(
-        root_tasks: List[orm_classes.Task],
+        root_tasks: List[models.Task],
         indent_size: int = 4,
         indentation_symbol: str = " ") -> str:
     if root_tasks:

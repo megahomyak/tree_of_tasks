@@ -1,10 +1,10 @@
 from typing import List
 
-from orm import orm_classes
+from orm import models
 
 
 def get_tasks_as_strings(
-        root_tasks: List[orm_classes.Task],
+        root_tasks: List[models.Task],
         indentation_level: int = 0,
         indent_size: int = 4,
         indentation_symbol: str = " ") -> List[str]:

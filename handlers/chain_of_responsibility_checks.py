@@ -1,6 +1,6 @@
 from typing import Optional
 
-from orm import orm_classes
+from orm import models
 from orm.db_apis import TasksManager
 
 
@@ -9,7 +9,7 @@ class ValidationError(Exception):
 
 
 def parent_id_is_equal_to_the_current_task_id(
-        task: orm_classes.Task, parent_id: int) -> None:
+        task: models.Task, parent_id: int) -> None:
     if task.id == parent_id:
         raise ValidationError(
             f"Задача не может быть родителем самой себя! "
@@ -19,7 +19,7 @@ def parent_id_is_equal_to_the_current_task_id(
 
 def parent_id_exists(
         tasks_manager: TasksManager, parent_id: Optional[int],
-        task: orm_classes.Task) -> None:
+        task: models.Task) -> None:
     if (
         parent_id is not None
         and
@@ -30,7 +30,7 @@ def parent_id_exists(
         raise ValidationError(f"Задачи с ID {parent_id} нет!")
 
 
-def check_for_subtask(task: orm_classes.Task, parent_id: Optional[int]) -> None:
+def check_for_subtask(task: models.Task, parent_id: Optional[int]) -> None:
     if parent_id and task.check_for_subtask(parent_id):
         raise ValidationError(
             f"Задача {parent_id} не может быть родителем задачи {task.id}, "
