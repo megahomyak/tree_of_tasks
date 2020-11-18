@@ -155,6 +155,7 @@ class Handlers:
         ids_of_tasks_with_second_error = []
         ids_of_tasks_with_third_error = []
         ids_of_tasks_with_fourth_error = []
+        ids_of_tasks_with_fifth_error = []
         ids_of_successful_tasks = []
         for task_id in task_ids:
             try:
@@ -164,13 +165,15 @@ class Handlers:
             else:
                 if task_id == parent_id:
                     ids_of_tasks_with_second_error.append(task_id)
+                elif task.parent_id == parent_id:
+                    ids_of_tasks_with_third_error.append(task_id)
                 elif (
                     parent_id is not None
                     and self.tasks_manager.check_existence(task.id == parent_id)
                 ):
-                    ids_of_tasks_with_third_error.append(task_id)
-                elif parent_id and task.check_for_subtask(parent_id):
                     ids_of_tasks_with_fourth_error.append(task_id)
+                elif parent_id and task.check_for_subtask(parent_id):
+                    ids_of_tasks_with_fifth_error.append(task_id)
                 else:
                     ids_of_successful_tasks.append(task_id)
                     task.parent_id = parent_id
@@ -187,11 +190,26 @@ class Handlers:
         )
         third_error_msg = handler_helpers.make_message_with_enumeration(
             ids_of_tasks_with_third_error,
-            "Задачи с ID {} нет, поэтому ее нельзя назначить родителем!",
-            "Задач с ID {} нет, поэтому их нельзя назначить родителями!"
+            (
+                "Задача с ID {} уже содержит в качестве родителя задачу с "
+                "указанным ID родителя!"
+            ),
+            (
+                "Задачи с ID {} уже содержат в качестве родителя задачу с "
+                "указанным ID родителя!"
+            ),
+            ending=(
+                " (Пример: указанный ID родительской задачи - 1, Задача 2 уже "
+                "имеет родителя, и это - Задача 1)"
+            )
         )
         fourth_error_msg = handler_helpers.make_message_with_enumeration(
             ids_of_tasks_with_fourth_error,
+            "Задачи с ID {} нет, поэтому ее нельзя назначить родителем!",
+            "Задач с ID {} нет, поэтому их нельзя назначить родителями!"
+        )
+        fifth_error_msg = handler_helpers.make_message_with_enumeration(
+            ids_of_tasks_with_fifth_error,
             (
                 "Задача с ID {} в одной из своих подзадач содержит указанного "
                 "родителя, поэтому ее нельзя сделать дочерней задачей этого "
@@ -215,7 +233,7 @@ class Handlers:
         errors = list(filter(
             None, [
                 first_error_msg, second_error_msg, third_error_msg,
-                fourth_error_msg, success_msg
+                fourth_error_msg, fifth_error_msg, success_msg
             ]
         ))
         return "\n".join(errors) if errors else None
