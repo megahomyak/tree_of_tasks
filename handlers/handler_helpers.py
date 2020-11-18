@@ -6,10 +6,8 @@ from orm import models
 
 
 def get_tasks_as_strings(
-        root_tasks: List[models.Task],
-        indentation_level: int = 0,
-        indent_size: int = 4,
-        indentation_symbol: str = " ") -> List[str]:
+        root_tasks: List[models.Task], indentation_level: int = 0,
+        indent_size: int = 4, indentation_symbol: str = " ") -> List[str]:
     tasks_as_strings = []
     for task in root_tasks:
         tasks_as_strings.append(
@@ -34,8 +32,7 @@ def get_strings_enumeration(strings: List[str]) -> str:
 
 
 def make_strings_with_enumeration(
-        error_ids: List[int], single_id_text: str,
-        multiple_ids_text: str,
+        error_ids: List[int], single_id_text: str, multiple_ids_text: str,
         ending: str = "") -> str:
     if len(error_ids) == 1:
         return single_id_text.format(error_ids[0]) + ending

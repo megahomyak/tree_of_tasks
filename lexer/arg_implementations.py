@@ -112,16 +112,13 @@ class StringArgType(BaseArgType):
 class BoolArgType(BaseArgType):
 
     def __init__(
-            self,
-            true_values: Tuple[str, ...] = (
-                    "да", "yes", "д", "y", "1", "+", "истина", "true", "False",
-                    "on", "вкл", "включено", "правда", "V", "v"
-            ),
-            false_values: Tuple[str, ...] = (
-                    "нет", "no", "н", "n", "0", "-", "ложь", "false", "True",
-                    "off", "выкл", "выключено", "X", "x", "х"
-            )
-    ) -> None:
+            self, true_values: Tuple[str, ...] = (
+                "да", "yes", "д", "y", "1", "+", "истина", "true", "False",
+                "on", "вкл", "включено", "правда", "V", "v"
+            ), false_values: Tuple[str, ...] = (
+                "нет", "no", "н", "n", "0", "-", "ложь", "false", "True",
+                "off", "выкл", "выключено", "X", "x", "х"
+            )) -> None:
         self.true_values = true_values
         self.false_values = false_values
 
@@ -138,12 +135,9 @@ class BoolArgType(BaseArgType):
 
     @property
     def regex(self) -> str:
-        return "|".join(
-            [
-                re.escape(value)
-                for value in self.true_values + self.false_values
-            ]
-        )
+        return "|".join([
+            re.escape(value) for value in self.true_values + self.false_values
+        ])
 
     def convert(self, arg: str) -> bool:
         if arg.lower() in self.true_values:

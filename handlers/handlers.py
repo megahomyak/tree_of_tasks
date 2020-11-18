@@ -36,12 +36,10 @@ class Handlers:
     def get_help_message(
             self, commands: Tuple[lexer_classes.Command]) -> HandlingResult:
         return HandlingResult(
-            "\n\n".join(
-                [
-                    command.get_full_description(include_heading=True)
-                    for command in commands
-                ]
-            ), whether_to_print_a_tree=False
+            "\n\n".join([
+                command.get_full_description(include_heading=True)
+                for command in commands
+            ]), whether_to_print_a_tree=False
         )
 
     # noinspection PyMethodMayBeStatic
@@ -73,8 +71,7 @@ class Handlers:
                         if len(quoted_not_found_commands) == 1 else
                         f"Команды с названиями "
                         f"{', '.join(quoted_not_found_commands)} не найдены!"
-                    ),
-                    *command_descriptions_as_strings
+                    ), *command_descriptions_as_strings
                 ) if quoted_not_found_commands else
                 command_descriptions_as_strings
             ), whether_to_print_a_tree=False
@@ -83,10 +80,7 @@ class Handlers:
     def add_task(self, parent_id: int, text: str) -> HandlingResult:
         if (
             parent_id is None
-            or
-            self.tasks_manager.check_existence(
-                models.Task.id == parent_id
-            )
+            or self.tasks_manager.check_existence(models.Task.id == parent_id)
         ):
             task = models.Task(text=text, parent_id=parent_id)
             self.tasks_manager.add(task)
@@ -136,8 +130,7 @@ class Handlers:
             handler_helpers.make_optional_string_from_optional_strings(
                 [
                     handler_helpers.make_strings_with_enumeration(
-                        ids_of_non_existing_tasks,
-                        (
+                        ids_of_non_existing_tasks, (
                             "Задачи с ID {} нет, поэтому она не может быть "
                             "удалена!"
                         ),
@@ -178,12 +171,10 @@ class Handlers:
             handler_helpers.make_optional_string_from_optional_strings(
                 [
                     handler_helpers.make_strings_with_enumeration(
-                        ids_of_non_existing_tasks,
-                        (
+                        ids_of_non_existing_tasks, (
                             "Задачи с ID {} нет, поэтому ей нельзя сменить "
                             "состояние!"
-                        ),
-                        (
+                        ), (
                             "Задач с ID {} нет, поэтому им нельзя сменить "
                             "состояние!"
                         )
@@ -247,8 +238,7 @@ class Handlers:
             handler_helpers.make_optional_string_from_optional_strings(
                 [
                     handler_helpers.make_strings_with_enumeration(
-                        ids_of_tasks_with_first_error,
-                        (
+                        ids_of_tasks_with_first_error, (
                             "Задачи с ID {} нет, поэтому она не может быть "
                             "изменена!"
                         ),
@@ -260,44 +250,36 @@ class Handlers:
                         "Задачи с ID {} не могут быть родителями самих себя!"
                     ),
                     handler_helpers.make_strings_with_enumeration(
-                        ids_of_tasks_with_third_error,
-                        (
+                        ids_of_tasks_with_third_error, (
                             "Задача с ID {} уже содержит в качестве родителя "
                             "задачу с указанным ID родителя!"
-                        ),
-                        (
+                        ), (
                             "Задачи с ID {} уже содержат в качестве родителя "
                             "задачу с указанным ID родителя!"
-                        ),
-                        ending=(
+                        ), ending=(
                             " (Пример: указанный ID родительской задачи - 1, "
                             "Задача 2 уже имеет родителя, и это - Задача 1)"
                         )
                     ),
                     handler_helpers.make_strings_with_enumeration(
-                        ids_of_tasks_with_fourth_error,
-                        (
+                        ids_of_tasks_with_fourth_error, (
                             "Задачи с ID {} нет, поэтому ее нельзя назначить "
                             "родителем!"
-                        ),
-                        (
+                        ), (
                             "Задач с ID {} нет, поэтому их нельзя назначить "
                             "родителями!"
                         )
                     ),
                     handler_helpers.make_strings_with_enumeration(
-                        ids_of_tasks_with_fifth_error,
-                        (
+                        ids_of_tasks_with_fifth_error, (
                             "Задача с ID {} в одной из своих подзадач содержит "
                             "указанного родителя, поэтому ее нельзя сделать "
                             "дочерней задачей этого родителя!"
-                        ),
-                        (
+                        ), (
                             "Задачи с ID {} в одной из своих подзадач содержат "
                             "указанного родителя, поэтому их нельзя сделать "
                             "дочерней задачей этого родителя!"
-                        ),
-                        ending=(
+                        ), ending=(
                             " (Пример: Задача 1 содержит Задачу 2. "
                             "Задачу 1 нельзя сделать дочерней для Задачи 2.)"
                         )

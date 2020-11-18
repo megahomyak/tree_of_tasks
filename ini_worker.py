@@ -68,20 +68,15 @@ class INIWorker:
         Returns:
             current state of the config parser as string
         """
-        return "\n\n".join(  # Joining all the sections
-            [
-                "\n".join(
-                    [
-                        f"{section_name}",
-                        *[
-                            f"{key}={value}"
-                            for key, value in self.config_parser[section_name]
-                        ]
-                    ]
-                )
-                for section_name in self.config_parser.sections()
-            ]
-        )
+        return "\n\n".join([  # Joining all sections
+            "\n".join([  # Joining one section
+                f"{section_name}",
+                *[
+                    f"{key}={value}"
+                    for key, value in self.config_parser[section_name]
+                ]
+            ]) for section_name in self.config_parser.sections()
+        ])
 
     def as_dict(self) -> dict:
         """

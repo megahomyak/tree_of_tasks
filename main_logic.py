@@ -6,8 +6,8 @@ from handlers.handler_helpers import BooleanTaskFields, HandlingResult
 from handlers.handlers import Handlers
 from ini_worker import MyINIWorker
 from lexer import (
-    arg_implementations, constant_metadata_implementations,
-    lexer_classes, exceptions
+    arg_implementations, constant_metadata_implementations, lexer_classes,
+    exceptions
 )
 from orm import db_apis
 
@@ -20,8 +20,10 @@ class MainLogic:
             self, tasks_manager: db_apis.TasksManager,
             ini_worker: MyINIWorker, handlers: Handlers) -> None:
         self.tasks_manager = tasks_manager
-        ini_worker.load(default_contents="[DEFAULT]\n"
-                                         "auto_showing = True")
+        ini_worker.load(default_contents=(
+            "[DEFAULT]\n"
+            "auto_showing = True"
+        ))
         self.ini_worker = ini_worker
         self.handlers = handlers
         if self.ini_worker.get_auto_showing_state():
@@ -56,16 +58,15 @@ class MainLogic:
                     .CommandDescriptionsConstantMetadata,
                 )),
                 arguments=(lexer_classes.Arg(
-                        "названия команд",
-                        arg_implementations.SequenceArgType(
-                            arg_implementations.StringArgType()
-                        ),
-                        (
-                            "названия команд должны быть через запятую без "
-                            "пробела; название только одной команды тоже можно "
-                            "написать; в качестве имени команды можно "
-                            "использовать еще и любой псевдоним этой команды"
-                        )
+                    "названия команд",
+                    arg_implementations.SequenceArgType(
+                        arg_implementations.StringArgType()
+                    ), (
+                        "названия команд должны быть через запятую без "
+                        "пробела; название только одной команды тоже можно "
+                        "написать; в качестве имени команды можно "
+                        "использовать еще и любой псевдоним этой команды"
+                    )
                 ),)
             ),
             lexer_classes.Command(
@@ -103,8 +104,7 @@ class MainLogic:
                         "ID задач, которые нужно удалить",
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType()
-                        ),
-                        (
+                        ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
                         )
@@ -126,8 +126,7 @@ class MainLogic:
                         "ID задач, которые нужно пометить выполненными",
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType()
-                        ),
-                        (
+                        ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
                         )
@@ -146,8 +145,7 @@ class MainLogic:
                         "ID задач, которые нужно пометить невыполненными",
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType()
-                        ),
-                        (
+                        ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
                         )
@@ -169,8 +167,7 @@ class MainLogic:
                         "ID задач, которые нужно свернуть",
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType()
-                        ),
-                        (
+                        ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
                         )
@@ -192,8 +189,7 @@ class MainLogic:
                         "ID задач, которые нужно свернуть",
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType()
-                        ),
-                        (
+                        ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
                         )
@@ -201,10 +197,7 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                names=(
-                    "изменить", "отредактировать",
-                    "change", "edit"
-                ),
+                names=("изменить", "отредактировать", "change", "edit"),
                 description="изменяет текст указанной задачи",
                 handler=handlers.edit_task,
                 arguments=(
@@ -314,13 +307,7 @@ class MainLogic:
 
 
 if __name__ == '__main__':
-    ini_worker = MyINIWorker(
-        ConfigParser(),
-        "tree_of_tasks_config.ini"
-    )
-    tasks_manager = db_apis.TasksManager(
-        db_apis.get_sqlalchemy_db_session("sqlite:///tree_of_tasks.db")
-    )
+    ini_worker = MyINIWorker(ConfigParser(), "tree_of_tasks_config.ini")
     main_logic = MainLogic(
         tasks_manager,
         ini_worker,

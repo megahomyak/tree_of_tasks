@@ -7,7 +7,6 @@ from lexer import exceptions
 
 
 class BaseArgType(ABC):
-
     """
     Base class for arguments (aka fields) in commands from the user
     """
@@ -42,7 +41,6 @@ class BaseArgType(ABC):
 
 @dataclass
 class Arg:
-
     name: str
     type: BaseArgType
     description: Optional[str] = None
@@ -50,7 +48,6 @@ class Arg:
 
 @dataclass
 class ConstantContext:
-
     commands: Tuple["Command", ...]
     command_descriptions: Dict[str, List[Callable]]
 
@@ -84,7 +81,6 @@ class ConvertedCommand:
 
 @dataclass
 class Command:
-
     names: Tuple[str, ...]
     description: str
     handler: Callable
