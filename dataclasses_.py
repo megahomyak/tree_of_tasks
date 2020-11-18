@@ -1,7 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Tuple, Any, Callable, Union, Optional, Type
+from typing import Tuple, Any, Callable, Union, Optional, Type, Dict, List
 
 import exceptions
 
@@ -254,7 +254,8 @@ class Command:
             )
         )
 
-    def get_all_metadata_as_converted(self, context: Context) -> Tuple[Any]:
+    def get_all_metadata_as_converted(
+            self, context: ConstantContext) -> Tuple[Any]:
         return tuple(
             one_metadata.get_data_from_context(context)
             for one_metadata in self.metadata_tuple
