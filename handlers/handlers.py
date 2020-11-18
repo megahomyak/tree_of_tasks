@@ -65,6 +65,7 @@ class Handlers:
             task = models.Task(text=text, parent_id=parent_id)
             self.tasks_manager.add(task)
             self.tasks_manager.commit()
+            return "Задача создана!"
         else:
             return (
                 f"Задачи с ID {parent_id} нет, поэтому новая задача не может "
@@ -148,6 +149,7 @@ class Handlers:
         else:
             task.text = text
             self.tasks_manager.commit()
+            return "Задача изменена!"
 
     def change_parent_of_task(
             self, parent_id: int, task_ids: Tuple[int]) -> Optional[str]:
