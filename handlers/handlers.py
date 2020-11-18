@@ -175,7 +175,8 @@ class Handlers:
                     ids_of_successful_tasks.append(task_id)
                 else:
                     ids_of_tasks_where_nothing_changed.append(task_id)
-        self.tasks_manager.commit()
+        if ids_of_successful_tasks:
+            self.tasks_manager.commit()
         return HandlingResult(
             handler_helpers.make_optional_string_from_optional_strings(
                 [
