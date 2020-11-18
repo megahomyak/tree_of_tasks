@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from orm import models
 
@@ -41,3 +41,9 @@ def make_strings_with_enumeration(
         return (multiple_ids_text.format(get_strings_enumeration(
             list(map(str, error_ids))
         )) + ending) if error_ids else None
+
+
+def make_optional_string_from_optional_strings(
+        strings: List[Optional[str]], separator: str = "\n") -> str:
+    errors = list(filter(None, strings))
+    return separator.join(errors) if errors else None
