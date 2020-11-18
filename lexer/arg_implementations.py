@@ -25,7 +25,7 @@ class SequenceArgType(BaseArgType):
         )
 
     def __init__(
-            self, element_type: BaseArgType, separator: str = ",") -> None:
+            self, element_type: BaseArgType, separator: str = r" *, *") -> None:
         self.element_type = element_type
         self.separator = separator
 
