@@ -273,7 +273,7 @@ class MainLogic:
             try:
                 command_args = command_.convert_command_to_args(command)
             except exceptions.ParsingError:
-                pass
+                return "Что?"
             else:
                 return command_.attached_function(
                     *command_.get_all_metadata_as_converted(
@@ -281,7 +281,6 @@ class MainLogic:
                     ),
                     *command_args
                 )
-        return "Что?"
 
 
 if __name__ == '__main__':
