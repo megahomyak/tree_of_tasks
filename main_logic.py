@@ -60,10 +60,10 @@ class MainLogic:
                     arg_implementations.SequenceArgType(
                         arg_implementations.StringArgType()
                     ), (
-                        "названия команд должны быть через запятую без "
-                        "пробела; название только одной команды тоже можно "
-                        "написать; в качестве имени команды можно "
-                        "использовать еще и любой псевдоним этой команды"
+                        "названия команд должны быть через запятую; название "
+                        "только одной команды тоже можно написать; в качестве "
+                        "имени команды можно использовать еще и любой "
+                        "псевдоним этой команды"
                     )
                 ),)
             ),
@@ -103,7 +103,7 @@ class MainLogic:
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType(is_signed=False)
                         ), (
-                            "ID задач должны быть через запятую без пробела; "
+                            "ID задач должны быть через запятую; "
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
@@ -125,7 +125,7 @@ class MainLogic:
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType(is_signed=False)
                         ), (
-                            "ID задач должны быть через запятую без пробела; "
+                            "ID задач должны быть через запятую; "
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
@@ -144,7 +144,7 @@ class MainLogic:
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType(is_signed=False)
                         ), (
-                            "ID задач должны быть через запятую без пробела; "
+                            "ID задач должны быть через запятую; "
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
@@ -166,7 +166,7 @@ class MainLogic:
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType(is_signed=False)
                         ), (
-                            "ID задач должны быть через запятую без пробела; "
+                            "ID задач должны быть через запятую; "
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
@@ -188,7 +188,7 @@ class MainLogic:
                         arg_implementations.SequenceArgType(
                             arg_implementations.IntArgType(is_signed=False)
                         ), (
-                            "ID задач должны быть через запятую без пробела; "
+                            "ID задач должны быть через запятую; "
                             "ID только одной задачи тоже можно написать"
                         )
                     ),
@@ -218,8 +218,7 @@ class MainLogic:
                     "изменяет ID родителя указанных задач (задачи "
                     "\"переезжают\" в дочерние к другой задаче); "
                     "ID родителя может быть пропущено (-), тогда задачи "
-                    "станут корневыми; задачи нужно прописывать через запятую "
-                    "без пробела"
+                    "станут корневыми; задачи нужно прописывать через запятую"
                 ),
                 handler=handlers.change_parent_of_task,
                 arguments=(

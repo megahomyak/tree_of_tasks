@@ -21,7 +21,7 @@ class SequenceArgType(BaseArgType):
     def description(self) -> str:
         return (
             f"От 1 до бесконечности элементов типа '{self.element_type.name}', "
-            f"разделенных через '{self.separator}'"
+            f"разделенных через '{self.separator}' (<- регулярное выражение)"
         )
 
     def __init__(
@@ -32,7 +32,7 @@ class SequenceArgType(BaseArgType):
     def convert(self, arg: str) -> tuple:
         return tuple(
             self.element_type.convert(element)
-            for element in arg.split(self.separator)
+            for element in re.split(self.separator, arg)
         )
 
 
