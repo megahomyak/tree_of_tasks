@@ -155,35 +155,73 @@ def edit_task(
 def change_parent_of_task(
         tasks_manager: TasksManager,
         parent_id: int, task_ids: Tuple[int]) -> Optional[str]:
-    errors = []
+    ids_of_tasks_with_first_error = []
+    ids_of_tasks_with_second_error = []
+    ids_of_tasks_with_third_error = []
+    ids_of_tasks_with_fourth_error = []
+    ids_of_successful_tasks = []
     for task_id in task_ids:
         try:
             task = tasks_manager.get_task_by_id(task_id)
         except NoResultFound:
-            errors.append(
-                f"Задачи с ID {task_id} нет, поэтому она не может быть "
-                f"изменена!"
-            )
+            ids_of_tasks_with_first_error.append(task_id)
         else:
             if task_id == parent_id:
-                errors.append(
-                    f"Задача не может быть родителем самой себя! "
-                    f"({task.id} == {parent_id})"
-                )
+                ids_of_tasks_with_second_error.append(task_id)
             elif (
                 parent_id is not None
                 and tasks_manager.check_existence(task.id == parent_id)
             ):
-                errors.append(f"Задачи с ID {parent_id} нет!")
+                ids_of_tasks_with_third_error.append(task_id)
             elif parent_id and task.check_for_subtask(parent_id):
-                errors.append(
-                    f"Задача {parent_id} не может быть родителем задачи "
-                    f"{task.id}, так как задача {task.id} содержит задачу "
-                    f"{parent_id} как дочернюю"
-                )
+                ids_of_tasks_with_fourth_error.append(task_id)
             else:
+                ids_of_successful_tasks.append(task_id)
                 task.parent_id = parent_id
-                tasks_manager.commit()
+    tasks_manager.commit()
+    first_error_msg = handler_helpers.make_message_with_enumeration(
+        ids_of_tasks_with_first_error,
+        "Задачи с ID {} нет, поэтому она не может быть изменена!",
+        "Задач с ID {} нет, поэтому они не могут быть изменены!"
+    )
+    second_error_msg = handler_helpers.make_message_with_enumeration(
+        ids_of_tasks_with_second_error,
+        "Задача с ID {} не может быть родителем самой себя!",
+        "Задачи с ID {} не могут быть родителями самих себя!"
+    )
+    third_error_msg = handler_helpers.make_message_with_enumeration(
+        ids_of_tasks_with_third_error,
+        "Задачи с ID {} нет, поэтому ее нельзя назначить родителем!",
+        "Задач с ID {} нет, поэтому их нельзя назначить родителями!"
+    )
+    fourth_error_msg = handler_helpers.make_message_with_enumeration(
+        ids_of_tasks_with_fourth_error,
+        (
+            "Задача с ID {} в одной из своих подзадач содержит указанного "
+            "родителя, поэтому ее нельзя сделать дочерней задачей этого "
+            "родителя!"
+        ),
+        (
+            "Задачи с ID {} в одной из своих подзадач содержат указанного "
+            "родителя, поэтому их нельзя сделать дочерней задачей этого "
+            "родителя!"
+        ),
+        ending=(
+            " (Пример: Задача 1 содержит Задачу 2. "
+            "Задачу 1 нельзя сделать дочерней для Задачи 2.)"
+        )
+    )
+    success_msg = handler_helpers.make_message_with_enumeration(
+        ids_of_successful_tasks,
+        "У задачи с ID {} была изменена родительская задача!",
+        "У задач с ID {} была изменена родительская задача!"
+    )
+    errors = list(filter(
+        None, [
+            first_error_msg, second_error_msg, third_error_msg,
+            fourth_error_msg, success_msg
+        ]
+    ))
     return "\n".join(errors) if errors else None
 
 

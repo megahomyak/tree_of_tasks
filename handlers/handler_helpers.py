@@ -25,3 +25,19 @@ def get_tasks_as_strings(
                 indentation_symbol
             ))
     return tasks_as_strings
+
+
+def get_strings_enumeration(strings: List[str]) -> str:
+    return " и ".join([i for i in (", ".join(strings[:-1]), strings[-1]) if i])
+
+
+def make_message_with_enumeration(
+        error_ids: List[int], single_id_text: str,
+        multiple_ids_text: str,
+        ending: str = "") -> str:
+    if len(error_ids) == 1:
+        return single_id_text.format(error_ids[0]) + ending
+    else:
+        return (multiple_ids_text.format(get_strings_enumeration(
+            list(map(str, error_ids))
+        )) + ending) if error_ids else None
