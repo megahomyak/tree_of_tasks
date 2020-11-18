@@ -51,9 +51,10 @@ class MainLogic:
                 names=("помощь", "команды", "help", "commands"),
                 description="показывает помощь по конкретным командам",
                 handler=handlers.get_help_message_for_specific_commands,
-                constant_metadata=(
-                    constant_metadata_implementations.CommandsConstantMetadata,
-                ),
+                constant_metadata=((
+                    constant_metadata_implementations
+                    .CommandDescriptionsConstantMetadata,
+                )),
                 arguments=(lexer_classes.Arg(
                         "названия команд",
                         arg_implementations.SequenceArgType(

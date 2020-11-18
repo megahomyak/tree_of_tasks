@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Dict, List, Callable
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -47,20 +47,36 @@ class Handlers:
     # noinspection PyMethodMayBeStatic
     # Because maybe in the future I will use self
     def get_help_message_for_specific_commands(
-            self, commands: Tuple[lexer_classes.Command],
-            command_names: Tuple[str]) -> HandlingResult:
-        help_messages = []
+            self, command_descriptions: Dict[str, List[Callable]],
+            command_names: Tuple[str, ...]) -> HandlingResult:
+        command_descriptions_as_strings = []
+        quoted_not_found_commands: List[str] = []
         for command_name in command_names:
-            for command in commands:
-                if command_name in command.names:
-                    help_messages.append(
-                        command.get_full_description(include_heading=True)
+            try:
+                command_descriptions_as_strings.extend(
+                    (
+                        # Here desc_func is a Command.get_full_description,
+                        # if I set Command.get_full_description as a type -
+                        # I wouldn't get any IDE hints anyway
+                        desc_func(include_heading=True)
+                        for desc_func in command_descriptions[command_name]
                     )
+                )
+            except KeyError:
+                quoted_not_found_commands.append(f"\"{command_name}\"")
         return HandlingResult(
-            (
-                "\n\n".join(help_messages)
-                if help_messages else
-                "Ни одна указанная команда не найдена!"
+            "\n\n".join(
+                (
+                    (
+                        f"Команда с названием "
+                        f"{quoted_not_found_commands[0]} не найдена!"
+                        if len(quoted_not_found_commands) == 1 else
+                        f"Команды с названиями "
+                        f"{', '.join(quoted_not_found_commands)} не найдены!"
+                    ),
+                    *command_descriptions_as_strings
+                ) if quoted_not_found_commands else
+                command_descriptions_as_strings
             ), whether_to_print_a_tree=False
         )
 
