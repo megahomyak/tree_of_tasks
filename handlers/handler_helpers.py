@@ -31,7 +31,7 @@ def get_strings_enumeration(strings: List[str]) -> str:
     return " и ".join([i for i in (", ".join(strings[:-1]), strings[-1]) if i])
 
 
-def make_message_with_enumeration(
+def make_strings_with_enumeration(
         error_ids: List[int], single_id_text: str,
         multiple_ids_text: str,
         ending: str = "") -> str:
