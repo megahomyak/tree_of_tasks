@@ -1,6 +1,6 @@
 import functools
 from configparser import ConfigParser
-from typing import NoReturn, Optional
+from typing import NoReturn, Optional, Dict, List, Callable
 
 import dataclasses_
 import exceptions
@@ -241,6 +241,20 @@ class MainLogic:
                 )
             )
         )
+        commands_description: Dict[str, List[Callable]] = {}
+        for command in self.commands:
+            for name in command.names:
+                try:
+                    commands_description[name].append(
+                        command.get_full_description
+                    )
+                except KeyError:
+                    commands_description[name] = [
+                        command.get_full_description
+                    ]
+        self.constant_context = dataclasses_.ConstantContext(
+            self.commands, commands_description
+        )
 
     def get_local_tasks_as_string(self):
         return self.handlers.get_tasks_as_string()
@@ -256,7 +270,6 @@ class MainLogic:
                 print(result)
 
     def handle_command(self, command: str) -> Optional[str]:
-        context = dataclasses_.Context(self.commands)
         for command_ in self.commands:
             try:
                 command_args = command_.convert_command_to_args(command)
@@ -264,7 +277,9 @@ class MainLogic:
                 pass
             else:
                 return command_.attached_function(
-                    *command_.get_all_metadata_as_converted(context),
+                    *command_.get_all_metadata_as_converted(
+                        self.constant_context
+                    ),
                     *command_args
                 )
         return "Что?"

@@ -196,23 +196,24 @@ class Arg:
 
 
 @dataclass
-class Context:
+class ConstantContext:
 
     commands: Tuple["Command", ...]
+    command_descriptions: Dict[str, List[Callable]]
 
 
 class BaseMetadata(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_data_from_context(context: Context) -> Any:
+    def get_data_from_context(context: ConstantContext) -> Any:
         pass
 
 
 class CommandsMetadata(BaseMetadata):
 
     @staticmethod
-    def get_data_from_context(context: Context) -> Any:
+    def get_data_from_context(context: ConstantContext) -> Any:
         return context.commands
 
 
