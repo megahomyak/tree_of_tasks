@@ -4,8 +4,6 @@ from dataclasses import dataclass
 from typing import Tuple, Any, Callable, Union, Optional, Type
 
 import exceptions
-from ini_worker import MyINIWorker
-from orm.db_apis import TasksManager
 
 
 class BaseArgType(ABC):
@@ -200,8 +198,6 @@ class Arg:
 @dataclass
 class Context:
 
-    tasks_manager: TasksManager
-    ini_worker: MyINIWorker
     commands: Tuple["Command", ...]
 
 
@@ -213,32 +209,11 @@ class BaseMetadata(ABC):
         pass
 
 
-class TasksManagerMetadata(BaseMetadata):
-
-    @staticmethod
-    def get_data_from_context(context: Context) -> Any:
-        return context.tasks_manager
-
-
 class CommandsMetadata(BaseMetadata):
 
     @staticmethod
     def get_data_from_context(context: Context) -> Any:
         return context.commands
-
-
-class INIWorkerMetadata(BaseMetadata):
-
-    @staticmethod
-    def get_data_from_context(context: Context) -> Any:
-        return context.ini_worker
-
-
-class RootTasksMetadata(BaseMetadata):
-
-    @staticmethod
-    def get_data_from_context(context: Context) -> Any:
-        return context.tasks_manager.get_root_tasks()
 
 
 @dataclass
