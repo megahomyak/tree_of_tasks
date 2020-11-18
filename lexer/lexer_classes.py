@@ -72,9 +72,10 @@ class Command:
     metadata_tuple: Tuple[Type[BaseMetadata], ...] = ()
     arguments: Tuple[Arg, ...] = ()
 
-    def convert_command_to_args(self, command: str) -> Tuple[Any, ...]:
+    def convert_command_to_args(
+            self, command: str, separator: str = " ") -> Tuple[Any, ...]:
         rgx_result = re.fullmatch(
-            pattern=" ".join(
+            pattern=separator.join(
                 [
                     f"(?:{'|'.join(re.escape(name) for name in self.names)})",
                     *[
