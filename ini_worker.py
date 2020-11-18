@@ -30,10 +30,10 @@ class INIWorker:
             file_path = self.file_path
         try:
             with open(file_path, "r") as f:
-                file_contents = f.read()
-                self.load_from_string(file_contents)
+                self.config_parser.read_file(f)
         except FileNotFoundError:
             if default_contents is not None:
+                self.load_from_string(default_contents)
                 with open(file_path, "w") as f:
                     f.write(default_contents)
             else:
