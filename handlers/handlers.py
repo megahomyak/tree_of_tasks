@@ -87,56 +87,69 @@ class Handlers:
             return "<дерево пустое>"
 
     def delete_tasks(self, task_ids: Tuple[int]) -> Optional[str]:
-        errors = []
+        ids_of_non_existing_tasks = []
+        ids_of_successful_tasks = []
         for task_id in task_ids:
             try:
                 self.tasks_manager.delete(
                     self.tasks_manager.get_task_by_id(task_id)
                 )
             except NoResultFound:
-                errors.append(
-                    f"Задачи с ID {task_id} нет, поэтому она не может быть "
-                    f"удалена"
-                )
+                ids_of_non_existing_tasks.append(task_id)
             else:
                 self.tasks_manager.commit()
-        return "\n".join(errors) if errors else None
+                ids_of_successful_tasks.append(task_id)
+        return handler_helpers.make_optional_string_from_optional_strings(
+            [
+                handler_helpers.make_strings_with_enumeration(
+                    ids_of_non_existing_tasks,
+                    "Задачи с ID {} нет, поэтому она не может быть удалена!",
+                    "Задач с ID {} нет, поэтому они не могут быть удалены!"
+                ),
+                handler_helpers.make_strings_with_enumeration(
+                    ids_of_successful_tasks,
+                    "Задача с ID {} успешно удалена!",
+                    "Задачи с ID {} успешно удалены!"
+                )
+            ]
+        )
 
-    def change_checked_state(
-            self, state: bool, task_ids: Tuple[int]) -> Optional[str]:
-        errors = []
+    def change_bool_field_state(
+            self, field: handler_helpers.BooleanTaskFields, state: bool,
+            task_ids: Tuple[int]) -> Optional[str]:
+        ids_of_non_existing_tasks = []
+        ids_of_successful_tasks = []
         for task_id in task_ids:
             try:
-                self.tasks_manager.get_task_by_id(
-                    task_id
-                ).change_state_recursively(is_checked=state)
+                if field is handler_helpers.BooleanTaskFields.IS_CHECKED:
+                    self.tasks_manager.get_task_by_id(
+                        task_id
+                    ).change_state_recursively(is_checked=state)
+                elif field is handler_helpers.BooleanTaskFields.IS_COLLAPSED:
+                    self.tasks_manager.get_task_by_id(
+                        task_id
+                    ).is_collapsed = state
+                else:
+                    raise NotImplementedError(f"Unknown field \"{field}\"!")
             except NoResultFound:
-                reason = (
-                    "она не может быть помечена"
-                    if state else
-                    "с нее нельзя убрать метку"
-                )
-                errors.append(f"Задачи с ID {task_id} нет, поэтому {reason}")
+                ids_of_non_existing_tasks.append(task_id)
             else:
                 self.tasks_manager.commit()
-        return "\n".join(errors) if errors else None
-
-    def change_collapsing_state(
-            self, state: bool, task_ids: Tuple[int]) -> Optional[str]:
-        errors = []
-        for task_id in task_ids:
-            try:
-                self.tasks_manager.get_task_by_id(task_id).is_collapsed = state
-            except NoResultFound:
-                reason = (
-                    "она не может быть свернута"
-                    if state else
-                    "она не может быть развернута"
+                ids_of_successful_tasks.append(task_id)
+        return handler_helpers.make_optional_string_from_optional_strings(
+            [
+                handler_helpers.make_strings_with_enumeration(
+                    ids_of_non_existing_tasks,
+                    "Задачи с ID {} нет, поэтому ей нельзя сменить состояние!",
+                    "Задач с ID {} нет, поэтому им нельзя сменить состояние!"
+                ),
+                handler_helpers.make_strings_with_enumeration(
+                    ids_of_successful_tasks,
+                    "Состояние задачи с ID {} успешно изменено!",
+                    "Состояние задач с ID {} успешно изменено!"
                 )
-                errors.append(f"Задачи с ID {task_id} нет, поэтому {reason}")
-            else:
-                self.tasks_manager.commit()
-        return "\n".join(errors) if errors else None
+            ]
+        )
 
     def edit_task(self, task_id: int, text: str) -> Optional[str]:
         try:

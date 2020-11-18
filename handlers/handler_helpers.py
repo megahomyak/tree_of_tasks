@@ -1,3 +1,4 @@
+from enum import Enum, auto
 from typing import List, Optional
 
 from orm import models
@@ -47,3 +48,8 @@ def make_optional_string_from_optional_strings(
         strings: List[Optional[str]], separator: str = "\n") -> str:
     errors = list(filter(None, strings))
     return separator.join(errors) if errors else None
+
+
+class BooleanTaskFields(Enum):
+    IS_CHECKED = auto()
+    IS_COLLAPSED = auto()

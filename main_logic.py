@@ -2,6 +2,7 @@ import functools
 from configparser import ConfigParser
 from typing import NoReturn, Optional, Dict, List, Callable
 
+from handlers.handler_helpers import BooleanTaskFields
 from handlers.handlers import Handlers
 from ini_worker import MyINIWorker
 from lexer import (
@@ -110,7 +111,10 @@ class MainLogic:
                     "check", "mark", "complete", "x", "х", "X", "Х"
                 ),
                 "помечает задачи как выполненные",
-                functools.partial(handlers.change_checked_state, True),
+                functools.partial(
+                    handlers.change_bool_field_state,
+                    BooleanTaskFields.IS_CHECKED, True
+                ),
                 arguments=(
                     lexer_classes.Arg(
                         "ID задач, которые нужно пометить выполненными",
@@ -127,7 +131,10 @@ class MainLogic:
             lexer_classes.Command(
                 ("убрать метку", "снять метку", "uncheck"),
                 "помечает задачи как невыполненные",
-                functools.partial(handlers.change_checked_state, False),
+                functools.partial(
+                    handlers.change_bool_field_state,
+                    BooleanTaskFields.IS_CHECKED, False
+                ),
                 arguments=(
                     lexer_classes.Arg(
                         "ID задач, которые нужно пометить невыполненными",
@@ -147,7 +154,10 @@ class MainLogic:
                     "сворачивает задачу, так что все дочерние задачи не будут "
                     "видны"
                 ),
-                functools.partial(handlers.change_collapsing_state, True),
+                functools.partial(
+                    handlers.change_bool_field_state,
+                    BooleanTaskFields.IS_COLLAPSED, True
+                ),
                 arguments=(
                     lexer_classes.Arg(
                         "ID задач, которые нужно свернуть",
@@ -167,7 +177,10 @@ class MainLogic:
                     "разворачивает задачу, так что все дочерние задачи будут "
                     "видны"
                 ),
-                functools.partial(handlers.change_collapsing_state, False),
+                functools.partial(
+                    handlers.change_bool_field_state,
+                    BooleanTaskFields.IS_COLLAPSED, False
+                ),
                 arguments=(
                     lexer_classes.Arg(
                         "ID задач, которые нужно свернуть",
