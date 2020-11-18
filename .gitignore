@@ -1,0 +1,5 @@
+tree_of_tasks.db
+tree_of_tasks.iml
+tree_of_tasks_config.ini
+.idea
+__pycache__/
