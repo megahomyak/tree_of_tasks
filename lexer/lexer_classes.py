@@ -64,6 +64,12 @@ class BaseMetadata(ABC):
 
 
 @dataclass
+class ConvertedCommand:
+    name: str
+    arguments: list
+
+
+@dataclass
 class Command:
 
     names: Tuple[str, ...]
@@ -73,33 +79,47 @@ class Command:
     arguments: Tuple[Arg, ...] = ()
 
     def convert_command_to_args(
-            self, command: str, separator: str = " ") -> Tuple[Any, ...]:
-        rgx_result = re.fullmatch(
-            pattern=separator.join(
+            self, command: str, separator: str = " ") -> ConvertedCommand:
+        """
+        Takes some str, converts it to tuple with some values.
+
+        Args:
+            command:
+                user input (like "command arg1 arg2")
+            separator:
+                what symbol needs to be between arguments (regex);
+                default " "
+
+        Returns:
+            tuple of some values, which are converted arguments from string
+        """
+        for args_num in range(len(self.arguments) + 1):
+            names = '|'.join(re.escape(name) for name in self.names)
+            pattern = separator.join(
                 [
-                    f"(?:{'|'.join(re.escape(name) for name in self.names)})",
-                    *[
+                    f"({names})", *[
                         f"({arg.type.regex})"
-                        for arg in self.arguments
+                        for arg in self.arguments[:args_num]
                     ]  # Something like (\d\d)
                 ]  # Something like (?:command) (\d\d)
-            ),
-            string=command
-        )
-        if rgx_result is None:
-            raise exceptions.ParsingError
+            ) + ("$" if args_num == len(self.arguments) else "")
+            rgx_result = re.match(pattern, command)
+            if rgx_result is None:
+                raise exceptions.ParsingError(args_num)
+        # noinspection PyUnboundLocalVariable
+        # because range(len(self.arguments) + 1) will be at least with length of
+        # 1
+        rgx_groups = rgx_result.groups()
         # noinspection PyArgumentList
         # because IDK why it thinks that `arg` argument is already filled
         # (like `self`)
-        return tuple(
-            converter(group)
-            for group, converter in zip(
-                rgx_result.groups(),
-                [
-                    arg.type.convert
-                    for arg in self.arguments
-                ]
-            )
+        return ConvertedCommand(
+            name=rgx_groups[0],
+            arguments=[
+                converter(group) for group, converter in zip(
+                    rgx_groups[1:], [arg.type.convert for arg in self.arguments]
+                )
+            ]
         )
 
     def get_all_metadata_as_converted(

@@ -269,18 +269,27 @@ class MainLogic:
                 print(result)
 
     def handle_command(self, command: str) -> Optional[str]:
+        error_args_amount = 0
         for command_ in self.commands:
             try:
-                command_args = command_.convert_command_to_args(command)
-            except exceptions.ParsingError:
-                return "Что?"
+                converted_command = command_.convert_command_to_args(command)
+            except exceptions.ParsingError as parsing_error:
+                if parsing_error.args_num > error_args_amount:
+                    error_args_amount = parsing_error.args_num
             else:
                 return command_.attached_function(
                     *command_.get_all_metadata_as_converted(
                         self.constant_context
                     ),
-                    *command_args
+                    *converted_command.arguments
                 )
+        if error_args_amount == 0:
+            return "Ошибка обработки команды на её названии!"
+        else:
+            return (
+                f"Ошибка обработки команды на аргументе номер "
+                f"{error_args_amount} (он неправильный или пропущен)"
+            )
 
 
 if __name__ == '__main__':
