@@ -2,9 +2,9 @@ from typing import Tuple, Optional
 
 from sqlalchemy.orm.exc import NoResultFound
 
-import dataclasses_
 from handlers import handler_helpers
 from ini_worker import MyINIWorker
+from lexer import lexer_classes
 from orm import models
 from orm.db_apis import TasksManager
 
@@ -28,7 +28,7 @@ class Handlers:
 
     # noinspection PyMethodMayBeStatic
     # Because maybe in the future I will use self
-    def get_help_message(self, commands: Tuple[dataclasses_.Command]) -> str:
+    def get_help_message(self, commands: Tuple[lexer_classes.Command]) -> str:
         return "\n\n".join(
             [
                 command.get_full_description(include_heading=True)
@@ -39,7 +39,7 @@ class Handlers:
     # noinspection PyMethodMayBeStatic
     # Because maybe in the future I will use self
     def get_help_message_for_specific_commands(
-            self, commands: Tuple[dataclasses_.Command],
+            self, commands: Tuple[lexer_classes.Command],
             command_names: Tuple[str]) -> str:
         help_messages = []
         for command_name in command_names:

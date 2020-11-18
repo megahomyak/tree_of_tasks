@@ -2,10 +2,13 @@ import functools
 from configparser import ConfigParser
 from typing import NoReturn, Optional, Dict, List, Callable
 
-import dataclasses_
 import exceptions
 from handlers.handlers import Handlers
 from ini_worker import MyINIWorker
+from lexer import (
+    arg_implementations, constant_metadata_implementations,
+    lexer_classes
+)
 from orm import db_apis
 
 
@@ -24,37 +27,33 @@ class MainLogic:
         if self.ini_worker.get_auto_showing_state():
             print(self.get_local_tasks_as_string())
         self.commands = (
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("автопоказ", "autoshowing"),
                 "включает/выключает показ дерева задач после каждого изменения",
                 handlers.change_auto_showing,
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "состояние настройки",
-                        dataclasses_.BoolArgType()
+                        arg_implementations.BoolArgType()
                     ),
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("помощь", "команды", "help", "commands"),
                 "показывает список команд",
                 handlers.get_help_message,
-                (
-                    dataclasses_.CommandsMetadata,
-                )
+                (constant_metadata_implementations.CommandsMetadata,)
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("помощь", "команды", "help", "commands"),
                 "показывает помощь по конкретным командам",
                 handlers.get_help_message_for_specific_commands,
+                (constant_metadata_implementations.CommandsMetadata,),
                 (
-                    dataclasses_.CommandsMetadata,
-                ),
-                (
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "названия команд",
-                        dataclasses_.SequenceArgType(
-                            dataclasses_.StringArgType()
+                        arg_implementations.SequenceArgType(
+                            arg_implementations.StringArgType()
                         ),
                         (
                             "названия команд должны быть через запятую без "
@@ -65,7 +64,7 @@ class MainLogic:
                     ),
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("добавить", "add", "+"),
                 (
                     "добавляет задачу с указанным "
@@ -73,31 +72,31 @@ class MainLogic:
                 ),
                 handlers.add_task,
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID родителя",
-                        dataclasses_.OptionalIntArgType(),
+                        arg_implementations.OptionalIntArgType(),
                         "ID задачи, в которую будет вложена добавляемая задача"
                     ),
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "текст новой задачи",
-                        dataclasses_.StringArgType()
+                        arg_implementations.StringArgType()
                     )
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("показать", "show", "дерево", "tree"),
                 "выводит в консоль дерево задач",
                 handlers.get_tasks_as_string
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("удалить", "delete", "del", "-", "remove", "убрать", "rm"),
                 "удаляет задачу с указанным ID",
                 handlers.delete_tasks,
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID задач, которые нужно удалить",
-                        dataclasses_.SequenceArgType(
-                            dataclasses_.IntArgType()
+                        arg_implementations.SequenceArgType(
+                            arg_implementations.IntArgType()
                         ),
                         (
                             "ID задач должны быть через запятую без пробела; "
@@ -106,7 +105,7 @@ class MainLogic:
                     ),
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 (
                     "пометить", "чек", "отметить", "выполнить",
                     "check", "mark", "complete", "x", "х", "X", "Х"
@@ -114,10 +113,10 @@ class MainLogic:
                 "помечает задачи как выполненные",
                 functools.partial(handlers.change_checked_state, True),
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID задач, которые нужно пометить выполненными",
-                        dataclasses_.SequenceArgType(
-                            dataclasses_.IntArgType()
+                        arg_implementations.SequenceArgType(
+                            arg_implementations.IntArgType()
                         ),
                         (
                             "ID задач должны быть через запятую без пробела; "
@@ -126,15 +125,15 @@ class MainLogic:
                     ),
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("убрать метку", "снять метку", "uncheck"),
                 "помечает задачи как невыполненные",
                 functools.partial(handlers.change_checked_state, False),
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID задач, которые нужно пометить невыполненными",
-                        dataclasses_.SequenceArgType(
-                            dataclasses_.IntArgType()
+                        arg_implementations.SequenceArgType(
+                            arg_implementations.IntArgType()
                         ),
                         (
                             "ID задач должны быть через запятую без пробела; "
@@ -143,7 +142,7 @@ class MainLogic:
                     ),
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("свернуть", "collapse"),
                 (
                     "сворачивает задачу, так что все дочерние задачи не будут "
@@ -151,10 +150,10 @@ class MainLogic:
                 ),
                 functools.partial(handlers.change_collapsing_state, True),
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID задач, которые нужно свернуть",
-                        dataclasses_.SequenceArgType(
-                            dataclasses_.IntArgType()
+                        arg_implementations.SequenceArgType(
+                            arg_implementations.IntArgType()
                         ),
                         (
                             "ID задач должны быть через запятую без пробела; "
@@ -163,7 +162,7 @@ class MainLogic:
                     ),
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("развернуть", "expand"),
                 (
                     "разворачивает задачу, так что все дочерние задачи будут "
@@ -171,10 +170,10 @@ class MainLogic:
                 ),
                 functools.partial(handlers.change_collapsing_state, False),
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID задач, которые нужно свернуть",
-                        dataclasses_.SequenceArgType(
-                            dataclasses_.IntArgType()
+                        arg_implementations.SequenceArgType(
+                            arg_implementations.IntArgType()
                         ),
                         (
                             "ID задач должны быть через запятую без пробела; "
@@ -183,7 +182,7 @@ class MainLogic:
                     ),
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 (
                     "изменить", "отредактировать",
                     "change", "edit"
@@ -191,17 +190,17 @@ class MainLogic:
                 "изменяет текст указанной задачи",
                 handlers.edit_task,
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID задачи",
-                        dataclasses_.IntArgType()
+                        arg_implementations.IntArgType()
                     ),
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "текст задачи",
-                        dataclasses_.StringArgType()
+                        arg_implementations.StringArgType()
                     )
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 (
                     "переместить", "двинуть", "сдвинуть", "передвинуть", "move",
                     "удочерить", "adopt"
@@ -215,28 +214,28 @@ class MainLogic:
                 ),
                 handlers.change_parent_of_task,
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID нового родителя",
-                        dataclasses_.OptionalIntArgType(),
+                        arg_implementations.OptionalIntArgType(),
                         "к кому переезжает"
                     ),
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID задач",
-                        dataclasses_.SequenceArgType(
-                            dataclasses_.IntArgType()
+                        arg_implementations.SequenceArgType(
+                            arg_implementations.IntArgType()
                         ),
                         "что переезжает"
                     )
                 )
             ),
-            dataclasses_.Command(
+            lexer_classes.Command(
                 ("дата", "date", "time", "время"),
                 "показывает дату (и время) создания задачи",
                 handlers.show_date,
                 arguments=(
-                    dataclasses_.Arg(
+                    lexer_classes.Arg(
                         "ID задачи",
-                        dataclasses_.IntArgType()
+                        arg_implementations.IntArgType()
                     ),
                 )
             )
@@ -252,7 +251,7 @@ class MainLogic:
                     commands_description[name] = [
                         command.get_full_description
                     ]
-        self.constant_context = dataclasses_.ConstantContext(
+        self.constant_context = lexer_classes.ConstantContext(
             self.commands, commands_description
         )
 
