@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Tuple, Any, Callable, Optional, Type, Dict, List
 
-import exceptions
+from lexer import exceptions
 
 
 class BaseArgType(ABC):

@@ -2,12 +2,11 @@ import functools
 from configparser import ConfigParser
 from typing import NoReturn, Optional, Dict, List, Callable
 
-import exceptions
 from handlers.handlers import Handlers
 from ini_worker import MyINIWorker
 from lexer import (
     arg_implementations, constant_metadata_implementations,
-    lexer_classes
+    lexer_classes, exceptions
 )
 from orm import db_apis
 
