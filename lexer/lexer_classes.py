@@ -137,14 +137,14 @@ class Command:
         )
 
     def get_all_metadata_as_converted(
-            self, context: Context) -> Tuple[Any]:
+            self, context: Context) -> tuple:
         return tuple(
             one_metadata.get_data_from_context(context)
             for one_metadata in self.metadata
         )
 
     def get_all_constant_metadata_as_converted(
-            self, constant_context: ConstantContext) -> Tuple[Any]:
+            self, constant_context: ConstantContext) -> tuple:
         return tuple(
             one_metadata.get_data_from_context(constant_context)
             for one_metadata in self.constant_metadata

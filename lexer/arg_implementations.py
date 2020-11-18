@@ -1,5 +1,5 @@
 import re
-from typing import Tuple, Any, Union
+from typing import Tuple, Union
 
 from lexer.lexer_classes import BaseArgType
 
@@ -29,7 +29,7 @@ class SequenceArgType(BaseArgType):
         self.element_type = element_type
         self.separator = separator
 
-    def convert(self, arg: str) -> Tuple[Any]:
+    def convert(self, arg: str) -> tuple:
         return tuple(
             self.element_type.convert(element)
             for element in arg.split(self.separator)
