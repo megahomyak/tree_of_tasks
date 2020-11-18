@@ -28,29 +28,33 @@ class MainLogic:
             print(self.handlers.get_tasks_as_string().message)
         self.commands = (
             lexer_classes.Command(
-                ("автопоказ", "autoshowing"),
-                "включает/выключает показ дерева задач после каждого изменения",
-                handlers.change_auto_showing,
-                arguments=(
-                    lexer_classes.Arg(
-                        "состояние настройки",
-                        arg_implementations.BoolArgType()
-                    ),
+                names=("автопоказ", "autoshowing"),
+                description=(
+                    "включает/выключает показ дерева задач после каждого "
+                    "изменения"
+                ),
+                handler=handlers.change_auto_showing,
+                arguments=(lexer_classes.Arg(
+                    "состояние настройки",
+                    arg_implementations.BoolArgType()
+                ),)
+            ),
+            lexer_classes.Command(
+                names=("помощь", "команды", "help", "commands"),
+                description="показывает список команд",
+                handler=handlers.get_help_message,
+                constant_metadata=(
+                    constant_metadata_implementations.CommandsConstantMetadata,
                 )
             ),
             lexer_classes.Command(
-                ("помощь", "команды", "help", "commands"),
-                "показывает список команд",
-                handlers.get_help_message,
-                (constant_metadata_implementations.CommandsConstantMetadata,)
-            ),
-            lexer_classes.Command(
-                ("помощь", "команды", "help", "commands"),
-                "показывает помощь по конкретным командам",
-                handlers.get_help_message_for_specific_commands,
-                (constant_metadata_implementations.CommandsConstantMetadata,),
-                (
-                    lexer_classes.Arg(
+                names=("помощь", "команды", "help", "commands"),
+                description="показывает помощь по конкретным командам",
+                handler=handlers.get_help_message_for_specific_commands,
+                constant_metadata=(
+                    constant_metadata_implementations.CommandsConstantMetadata,
+                ),
+                arguments=(lexer_classes.Arg(
                         "названия команд",
                         arg_implementations.SequenceArgType(
                             arg_implementations.StringArgType()
@@ -61,16 +65,15 @@ class MainLogic:
                             "написать; в качестве имени команды можно "
                             "использовать еще и любой псевдоним этой команды"
                         )
-                    ),
-                )
+                ),)
             ),
             lexer_classes.Command(
-                ("добавить", "add", "+"),
-                (
+                names=("добавить", "add", "+"),
+                description=(
                     "добавляет задачу с указанным "
                     "родителем (необязательно) и текстом"
                 ),
-                handlers.add_task,
+                handler=handlers.add_task,
                 arguments=(
                     lexer_classes.Arg(
                         "ID родителя",
@@ -84,14 +87,16 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                ("показать", "show", "дерево", "tree"),
-                "выводит в консоль дерево задач",
-                handlers.get_tasks_as_string
+                names=("показать", "show", "дерево", "tree"),
+                description="выводит в консоль дерево задач",
+                handler=handlers.get_tasks_as_string
             ),
             lexer_classes.Command(
-                ("удалить", "delete", "del", "-", "remove", "убрать", "rm"),
-                "удаляет задачу с указанным ID",
-                handlers.delete_tasks,
+                names=(
+                    "удалить", "delete", "del", "-", "remove", "убрать", "rm"
+                ),
+                description="удаляет задачу с указанным ID",
+                handler=handlers.delete_tasks,
                 arguments=(
                     lexer_classes.Arg(
                         "ID задач, которые нужно удалить",
@@ -106,12 +111,12 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                (
+                names=(
                     "пометить", "чек", "отметить", "выполнить",
                     "check", "mark", "complete", "x", "х", "X", "Х"
                 ),
-                "помечает задачи как выполненные",
-                functools.partial(
+                description="помечает задачи как выполненные",
+                handler=functools.partial(
                     handlers.change_bool_field_state,
                     BooleanTaskFields.IS_CHECKED, True
                 ),
@@ -129,9 +134,9 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                ("убрать метку", "снять метку", "uncheck"),
-                "помечает задачи как невыполненные",
-                functools.partial(
+                names=("убрать метку", "снять метку", "uncheck"),
+                description="помечает задачи как невыполненные",
+                handler=functools.partial(
                     handlers.change_bool_field_state,
                     BooleanTaskFields.IS_CHECKED, False
                 ),
@@ -149,12 +154,12 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                ("свернуть", "collapse"),
-                (
+                names=("свернуть", "collapse"),
+                description=(
                     "сворачивает задачу, так что все дочерние задачи не будут "
                     "видны"
                 ),
-                functools.partial(
+                handler=functools.partial(
                     handlers.change_bool_field_state,
                     BooleanTaskFields.IS_COLLAPSED, True
                 ),
@@ -172,12 +177,12 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                ("развернуть", "expand"),
-                (
+                names=("развернуть", "expand"),
+                description=(
                     "разворачивает задачу, так что все дочерние задачи будут "
                     "видны"
                 ),
-                functools.partial(
+                handler=functools.partial(
                     handlers.change_bool_field_state,
                     BooleanTaskFields.IS_COLLAPSED, False
                 ),
@@ -195,12 +200,12 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                (
+                names=(
                     "изменить", "отредактировать",
                     "change", "edit"
                 ),
-                "изменяет текст указанной задачи",
-                handlers.edit_task,
+                description="изменяет текст указанной задачи",
+                handler=handlers.edit_task,
                 arguments=(
                     lexer_classes.Arg(
                         "ID задачи",
@@ -213,18 +218,18 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                (
+                names=(
                     "переместить", "двинуть", "сдвинуть", "передвинуть", "move",
                     "удочерить", "adopt"
                 ),
-                (
+                description=(
                     "изменяет ID родителя указанных задач (задачи "
                     "\"переезжают\" в дочерние к другой задаче); "
                     "ID родителя может быть пропущено (-), тогда задачи "
                     "станут корневыми; задачи нужно прописывать через запятую "
                     "без пробела"
                 ),
-                handlers.change_parent_of_task,
+                handler=handlers.change_parent_of_task,
                 arguments=(
                     lexer_classes.Arg(
                         "ID нового родителя",
@@ -241,9 +246,9 @@ class MainLogic:
                 )
             ),
             lexer_classes.Command(
-                ("дата", "date", "time", "время"),
-                "показывает дату (и время) создания задачи",
-                handlers.show_date,
+                names=("дата", "date", "time", "время"),
+                description="показывает дату (и время) создания задачи",
+                handler=handlers.show_date,
                 arguments=(
                     lexer_classes.Arg(
                         "ID задачи",
