@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List, Optional
 
@@ -53,3 +54,9 @@ def make_optional_string_from_optional_strings(
 class BooleanTaskFields(Enum):
     IS_CHECKED = auto()
     IS_COLLAPSED = auto()
+
+
+@dataclass
+class HandlingResult:
+    message: str
+    whether_to_print_a_tree: bool

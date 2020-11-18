@@ -1,8 +1,8 @@
 import functools
 from configparser import ConfigParser
-from typing import NoReturn, Optional, Dict, List, Callable
+from typing import NoReturn, Dict, List, Callable
 
-from handlers.handler_helpers import BooleanTaskFields
+from handlers.handler_helpers import BooleanTaskFields, HandlingResult
 from handlers.handlers import Handlers
 from ini_worker import MyINIWorker
 from lexer import (
@@ -25,7 +25,7 @@ class MainLogic:
         self.ini_worker = ini_worker
         self.handlers = handlers
         if self.ini_worker.get_auto_showing_state():
-            print(self.get_local_tasks_as_string())
+            print(self.handlers.get_tasks_as_string().message)
         self.commands = (
             lexer_classes.Command(
                 ("автопоказ", "autoshowing"),
@@ -267,20 +267,18 @@ class MainLogic:
             self.commands, commands_description
         )
 
-    def get_local_tasks_as_string(self):
-        return self.handlers.get_tasks_as_string()
-
     def listen_for_commands_infinitely(self) -> NoReturn:
         while True:
             entered_command = input(">>> ")
-            result = self.handle_command(entered_command)
-            if result is None:
-                if self.ini_worker.get_auto_showing_state():
-                    print(self.get_local_tasks_as_string())
-            else:
-                print(result)
+            result: HandlingResult = self.handle_command(entered_command)
+            if (
+                result.whether_to_print_a_tree
+                and self.ini_worker.get_auto_showing_state()
+            ):
+                print(self.handlers.get_tasks_as_string().message)
+            print(result.message)
 
-    def handle_command(self, command: str) -> Optional[str]:
+    def handle_command(self, command: str) -> HandlingResult:
         error_args_amount = 0
         for command_ in self.commands:
             try:
@@ -296,11 +294,16 @@ class MainLogic:
                     *converted_command.arguments
                 )
         if error_args_amount == 0:
-            return "Ошибка обработки команды на её названии!"
+            return HandlingResult(
+                "Ошибка обработки команды на её названии!",
+                whether_to_print_a_tree=False
+            )
         else:
-            return (
-                f"Ошибка обработки команды на аргументе номер "
-                f"{error_args_amount} (он неправильный или пропущен)"
+            return HandlingResult(
+                (
+                    f"Ошибка обработки команды на аргументе номер "
+                    f"{error_args_amount} (он неправильный или пропущен)"
+                ), whether_to_print_a_tree=False
             )
 
 
