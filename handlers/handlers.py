@@ -63,7 +63,7 @@ class Handlers:
             )
         ):
             task = models.Task(text=text, parent_id=parent_id)
-            self.tasks_manager.append(task)
+            self.tasks_manager.add(task)
             self.tasks_manager.commit()
         else:
             return (

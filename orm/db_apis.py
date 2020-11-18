@@ -32,7 +32,7 @@ class TasksManager:
             .all()
         )
 
-    def append(self, *tasks: models.Task) -> None:
+    def add(self, *tasks: models.Task) -> None:
         self.db_session.add_all(tasks)
 
     def commit(self) -> None:
