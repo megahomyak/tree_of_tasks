@@ -77,7 +77,7 @@ class MainLogic:
                 arguments=(
                     lexer_classes.Arg(
                         "ID родителя",
-                        arg_implementations.OptionalIntArgType(),
+                        arg_implementations.OptionalIntArgType(is_signed=False),
                         "ID задачи, в которую будет вложена добавляемая задача"
                     ),
                     lexer_classes.Arg(
@@ -101,7 +101,7 @@ class MainLogic:
                     lexer_classes.Arg(
                         "ID задач, которые нужно удалить",
                         arg_implementations.SequenceArgType(
-                            arg_implementations.IntArgType()
+                            arg_implementations.IntArgType(is_signed=False)
                         ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
@@ -123,7 +123,7 @@ class MainLogic:
                     lexer_classes.Arg(
                         "ID задач, которые нужно пометить выполненными",
                         arg_implementations.SequenceArgType(
-                            arg_implementations.IntArgType()
+                            arg_implementations.IntArgType(is_signed=False)
                         ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
@@ -142,7 +142,7 @@ class MainLogic:
                     lexer_classes.Arg(
                         "ID задач, которые нужно пометить невыполненными",
                         arg_implementations.SequenceArgType(
-                            arg_implementations.IntArgType()
+                            arg_implementations.IntArgType(is_signed=False)
                         ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
@@ -164,7 +164,7 @@ class MainLogic:
                     lexer_classes.Arg(
                         "ID задач, которые нужно свернуть",
                         arg_implementations.SequenceArgType(
-                            arg_implementations.IntArgType()
+                            arg_implementations.IntArgType(is_signed=False)
                         ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
@@ -186,7 +186,7 @@ class MainLogic:
                     lexer_classes.Arg(
                         "ID задач, которые нужно свернуть",
                         arg_implementations.SequenceArgType(
-                            arg_implementations.IntArgType()
+                            arg_implementations.IntArgType(is_signed=False)
                         ), (
                             "ID задач должны быть через запятую без пробела; "
                             "ID только одной задачи тоже можно написать"
@@ -201,7 +201,7 @@ class MainLogic:
                 arguments=(
                     lexer_classes.Arg(
                         "ID задачи",
-                        arg_implementations.IntArgType()
+                        arg_implementations.IntArgType(is_signed=False)
                     ),
                     lexer_classes.Arg(
                         "текст задачи",
@@ -225,13 +225,13 @@ class MainLogic:
                 arguments=(
                     lexer_classes.Arg(
                         "ID нового родителя",
-                        arg_implementations.OptionalIntArgType(),
+                        arg_implementations.OptionalIntArgType(is_signed=False),
                         "к кому переезжает"
                     ),
                     lexer_classes.Arg(
                         "ID задач",
                         arg_implementations.SequenceArgType(
-                            arg_implementations.IntArgType()
+                            arg_implementations.IntArgType(is_signed=False)
                         ),
                         "что переезжает"
                     )
@@ -244,7 +244,7 @@ class MainLogic:
                 arguments=(
                     lexer_classes.Arg(
                         "ID задачи",
-                        arg_implementations.IntArgType()
+                        arg_implementations.IntArgType(is_signed=False)
                     ),
                 )
             )
