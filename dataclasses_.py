@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from typing import Tuple, Any, Callable, Union, Optional, Type
 
 import exceptions
+from ini_worker import MyINIWorker
 from orm.db_apis import TasksManager
-from scripts_for_settings.ini_worker import MyINIWorker
 
 
 class BaseArgType(ABC):

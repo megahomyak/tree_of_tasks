@@ -5,8 +5,8 @@ from typing import NoReturn, Optional
 import dataclasses_
 import exceptions
 from handlers import handlers
+from ini_worker import MyINIWorker
 from orm import db_apis
-from scripts_for_settings.ini_worker import MyINIWorker
 
 
 class MainLogic:

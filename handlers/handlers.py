@@ -4,9 +4,9 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import dataclasses_
 from handlers import handler_helpers
+from ini_worker import MyINIWorker
 from orm import models
 from orm.db_apis import TasksManager
-from scripts_for_settings.ini_worker import MyINIWorker
 
 
 def change_auto_showing(settings: MyINIWorker, new_state: bool) -> str:
