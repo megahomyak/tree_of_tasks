@@ -149,24 +149,33 @@ class Handlers:
             self, field: handler_helpers.BooleanTaskFields, state: bool,
             task_ids: Tuple[int]) -> HandlingResult:
         ids_of_non_existing_tasks = []
+        ids_of_tasks_where_nothing_changed = []
         ids_of_successful_tasks = []
         for task_id in task_ids:
             try:
-                if field is handler_helpers.BooleanTaskFields.IS_CHECKED:
-                    self.tasks_manager.get_task_by_id(
-                        task_id
-                    ).change_state_recursively(is_checked=state)
-                elif field is handler_helpers.BooleanTaskFields.IS_COLLAPSED:
-                    self.tasks_manager.get_task_by_id(
-                        task_id
-                    ).is_collapsed = state
-                else:
-                    raise NotImplementedError(f"Unknown field \"{field}\"!")
+                task = self.tasks_manager.get_task_by_id(
+                    task_id
+                )
             except NoResultFound:
                 ids_of_non_existing_tasks.append(task_id)
             else:
-                self.tasks_manager.commit()
-                ids_of_successful_tasks.append(task_id)
+                if field is handler_helpers.BooleanTaskFields.IS_CHECKED:
+                    something_changed = task.change_state_recursively(
+                        is_checked=state
+                    )
+                elif field is handler_helpers.BooleanTaskFields.IS_COLLAPSED:
+                    if task.is_collapsed == state:
+                        something_changed = False
+                    else:
+                        something_changed = True
+                        task.is_collapsed = state
+                else:
+                    raise NotImplementedError(f"Unknown field \"{field}\"!")
+                if something_changed:
+                    ids_of_successful_tasks.append(task_id)
+                else:
+                    ids_of_tasks_where_nothing_changed.append(task_id)
+        self.tasks_manager.commit()
         return HandlingResult(
             handler_helpers.make_optional_string_from_optional_strings(
                 [
@@ -178,6 +187,11 @@ class Handlers:
                             "Задач с ID {} нет, поэтому им нельзя сменить "
                             "состояние!"
                         )
+                    ),
+                    handler_helpers.make_strings_with_enumeration(
+                        ids_of_tasks_where_nothing_changed,
+                        "У задачи с ID {} ничего не изменилось!",
+                        "У задач с ID {} ничего не изменилось!"
                     ),
                     handler_helpers.make_strings_with_enumeration(
                         ids_of_successful_tasks,
