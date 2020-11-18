@@ -289,8 +289,8 @@ class MainLogic:
                 if parsing_error.args_num > error_args_amount:
                     error_args_amount = parsing_error.args_num
             else:
-                return command_.attached_function(
-                    *command_.get_all_metadata_as_converted(
+                return command_.handler(
+                    *command_.get_all_constant_metadata_as_converted(
                         self.constant_context
                     ),
                     *converted_command.arguments

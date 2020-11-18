@@ -55,11 +55,24 @@ class ConstantContext:
     command_descriptions: Dict[str, List[Callable]]
 
 
+@dataclass
+class Context:
+    pass
+
+
 class BaseConstantMetadata(ABC):
 
     @staticmethod
     @abstractmethod
     def get_data_from_context(context: ConstantContext) -> Any:
+        pass
+
+
+class BaseMetadata(ABC):
+
+    @staticmethod
+    @abstractmethod
+    def get_data_from_context(context: Context) -> Any:
         pass
 
 
@@ -74,8 +87,9 @@ class Command:
 
     names: Tuple[str, ...]
     description: str
-    attached_function: Callable
-    metadata_tuple: Tuple[Type[BaseMetadata], ...] = ()
+    handler: Callable
+    metadata: Tuple[Type[BaseMetadata], ...] = ()
+    constant_metadata: Tuple[Type[BaseConstantMetadata], ...] = ()
     arguments: Tuple[Arg, ...] = ()
 
     def convert_command_to_args(
@@ -123,10 +137,17 @@ class Command:
         )
 
     def get_all_metadata_as_converted(
-            self, context: ConstantContext) -> Tuple[Any]:
+            self, context: Context) -> Tuple[Any]:
         return tuple(
             one_metadata.get_data_from_context(context)
-            for one_metadata in self.metadata_tuple
+            for one_metadata in self.metadata
+        )
+
+    def get_all_constant_metadata_as_converted(
+            self, constant_context: ConstantContext) -> Tuple[Any]:
+        return tuple(
+            one_metadata.get_data_from_context(constant_context)
+            for one_metadata in self.constant_metadata
         )
 
     def get_full_description(
