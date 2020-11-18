@@ -17,9 +17,7 @@ class MainLogic:
     # noinspection PyShadowingNames
     # Because I don't care, it's the same object
     def __init__(
-            self, tasks_manager: db_apis.TasksManager,
-            ini_worker: MyINIWorker, handlers: Handlers) -> None:
-        self.tasks_manager = tasks_manager
+            self, ini_worker: MyINIWorker, handlers: Handlers) -> None:
         ini_worker.load(default_contents=(
             "[DEFAULT]\n"
             "auto_showing = True"
@@ -309,8 +307,12 @@ class MainLogic:
 if __name__ == '__main__':
     ini_worker = MyINIWorker(ConfigParser(), "tree_of_tasks_config.ini")
     main_logic = MainLogic(
-        tasks_manager,
         ini_worker,
-        Handlers(ini_worker, tasks_manager)
+        Handlers(
+            ini_worker,
+            db_apis.TasksManager(
+                db_apis.get_sqlalchemy_db_session("sqlite:///tree_of_tasks.db")
+            )
+        )
     )
     main_logic.listen_for_commands_infinitely()
