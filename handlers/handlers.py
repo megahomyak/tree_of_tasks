@@ -1,8 +1,9 @@
-from typing import Tuple, Optional
+from typing import Tuple
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from handlers import handler_helpers
+from handlers.handler_helpers import HandlingResult
 from ini_worker import MyINIWorker
 from lexer import lexer_classes
 from orm import models
@@ -17,7 +18,7 @@ class Handlers:
 
     def change_auto_showing(self, new_state: bool) -> str:
         new_state_str = str(new_state)
-        if self.ini_worker["auto_showing"] == new_state_str:
+        if self.ini_worker["auto_showing"] != new_state_str:
             self.ini_worker["auto_showing"] = new_state_str
             self.ini_worker.save()
             return (
