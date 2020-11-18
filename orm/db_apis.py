@@ -14,7 +14,7 @@ def get_sqlalchemy_db_session(path_to_db: str) -> sqlalchemy.orm.Session:
 
 class TasksManager:
 
-    def __init__(self, db_session: sqlalchemy.orm.Session) -> None:
+    def __init__(self, db_session: sqlalchemy.orm.Session):
         self.db_session = db_session
 
     def _get_query(self) -> sqlalchemy.orm.Query:

@@ -8,7 +8,7 @@ class INIWorker:
 
     def __init__(
             self, config_parser: ConfigParser,
-            file_path: str, default_section: str = "DEFAULT") -> None:
+            file_path: str, default_section: str = "DEFAULT"):
         self.config_parser = config_parser
         self.file_path = file_path
         self.default_section = default_section

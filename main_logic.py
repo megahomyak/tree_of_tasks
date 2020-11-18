@@ -16,8 +16,7 @@ class MainLogic:
 
     # noinspection PyShadowingNames
     # Because I don't care, it's the same object
-    def __init__(
-            self, ini_worker: MyINIWorker, handlers: Handlers) -> None:
+    def __init__(self, ini_worker: MyINIWorker, handlers: Handlers):
         ini_worker.load(default_contents=(
             "[DEFAULT]\n"
             "auto_showing = True"

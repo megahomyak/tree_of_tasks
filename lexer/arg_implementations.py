@@ -24,8 +24,7 @@ class SequenceArgType(BaseArgType):
             f"разделенных через '{self.separator}' (<- регулярное выражение)"
         )
 
-    def __init__(
-            self, element_type: BaseArgType, separator: str = r" *, *") -> None:
+    def __init__(self, element_type: BaseArgType, separator: str = r" *, *"):
         self.element_type = element_type
         self.separator = separator
 
@@ -50,7 +49,7 @@ class IntArgType(BaseArgType):
             return r"-?\d+"
         return r"\d+"
 
-    def __init__(self, is_signed: bool = True) -> None:
+    def __init__(self, is_signed: bool = True):
         self.is_signed = is_signed
 
     def convert(self, arg: str) -> int:
@@ -81,7 +80,7 @@ class OptionalIntArgType(BaseArgType):
             return r"(?:-?\d+|-)"
         return r"(?:\d+|-)"
 
-    def __init__(self, is_signed: bool = True) -> None:
+    def __init__(self, is_signed: bool = True):
         self.is_signed = is_signed
 
     def convert(self, arg: str) -> Optional[int]:
@@ -102,7 +101,7 @@ class StringArgType(BaseArgType):
             return r".+?"
         return fr"(?:.+?){{1,{self.length_limit}}}"
 
-    def __init__(self, length_limit: int = None) -> None:
+    def __init__(self, length_limit: int = None):
         self.length_limit = length_limit
 
     def convert(self, arg: str) -> str:
@@ -118,7 +117,7 @@ class BoolArgType(BaseArgType):
             ), false_values: Tuple[str, ...] = (
                 "нет", "no", "н", "n", "0", "-", "ложь", "false", "True",
                 "off", "выкл", "выключено", "X", "x", "х"
-            )) -> None:
+            )):
         self.true_values = true_values
         self.false_values = false_values
 
