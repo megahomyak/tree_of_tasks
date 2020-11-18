@@ -1,5 +1,5 @@
 import re
-from typing import Tuple, Union
+from typing import Tuple, Optional
 
 from lexer.lexer_classes import BaseArgType
 
@@ -84,7 +84,7 @@ class OptionalIntArgType(BaseArgType):
     def __init__(self, is_signed: bool = True) -> None:
         self.is_signed = is_signed
 
-    def convert(self, arg: str) -> Union[None, int]:
+    def convert(self, arg: str) -> Optional[int]:
         return int(arg) if arg != "-" else None
 
 
