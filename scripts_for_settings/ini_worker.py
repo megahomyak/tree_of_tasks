@@ -13,22 +13,31 @@ class INIWorker:
         self.file_path = file_path
         self.default_section = default_section
 
-    def load(self, file_path: Optional[str] = None) -> bool:
+    def load(
+            self, file_path: Optional[str] = None,
+            default_contents: Optional[str] = None) -> None:
         """
-        Loads config from file.
+        Loads config from file. Can create a file if it not exists and
+        default_contents is specified.
 
         Args:
             file_path: path to .ini file with config
-
-        Returns:
-            bool - something is loaded or not
+            default_contents:
+                if specified and file isn't found - creates a file with that
+                contents
         """
-        with open(self.file_path if file_path is None else file_path, "r") as f:
-            file_contents = f.read()
-        if file_contents:
-            self.load_from_string(file_contents)
-            return True
-        return False
+        if file_path is None:
+            file_path = self.file_path
+        try:
+            with open(file_path, "r") as f:
+                file_contents = f.read()
+                self.load_from_string(file_contents)
+        except FileNotFoundError:
+            if default_contents is not None:
+                with open(file_path, "w") as f:
+                    f.write(default_contents)
+            else:
+                raise
 
     def load_from_string(self, string: str) -> None:
         self.config_parser.read_string(string)

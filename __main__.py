@@ -15,12 +15,8 @@ class MainLogic:
             self, tasks_manager: db_apis.TasksManager,
             ini_worker: MyINIWorker) -> None:
         self.tasks_manager = tasks_manager
-        if not ini_worker.load():  # If nothing is loaded
-            ini_worker.load_from_string(
-                "[DEFAULT]\n"
-                "auto_showing = True"
-            )
-            ini_worker.save()
+        ini_worker.load(default_contents="[DEFAULT]\n"
+                                         "auto_showing = True")
         self.settings = ini_worker
         if self.settings.get_auto_showing_state():
             print(self.get_local_tasks_as_string())
