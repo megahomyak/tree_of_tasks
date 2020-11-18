@@ -55,7 +55,7 @@ class ConstantContext:
     command_descriptions: Dict[str, List[Callable]]
 
 
-class BaseMetadata(ABC):
+class BaseConstantMetadata(ABC):
 
     @staticmethod
     @abstractmethod

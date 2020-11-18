@@ -1,9 +1,9 @@
 from typing import Any
 
-from lexer.lexer_classes import BaseMetadata, ConstantContext
+from lexer.lexer_classes import BaseConstantMetadata, ConstantContext
 
 
-class CommandsMetadata(BaseMetadata):
+class CommandsConstantMetadata(BaseConstantMetadata):
 
     @staticmethod
     def get_data_from_context(context: ConstantContext) -> Any:

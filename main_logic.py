@@ -42,13 +42,13 @@ class MainLogic:
                 ("помощь", "команды", "help", "commands"),
                 "показывает список команд",
                 handlers.get_help_message,
-                (constant_metadata_implementations.CommandsMetadata,)
+                (constant_metadata_implementations.CommandsConstantMetadata,)
             ),
             lexer_classes.Command(
                 ("помощь", "команды", "help", "commands"),
                 "показывает помощь по конкретным командам",
                 handlers.get_help_message_for_specific_commands,
-                (constant_metadata_implementations.CommandsMetadata,),
+                (constant_metadata_implementations.CommandsConstantMetadata,),
                 (
                     lexer_classes.Arg(
                         "названия команд",
