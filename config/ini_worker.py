@@ -1,7 +1,8 @@
+import os
 from configparser import ConfigParser, SectionProxy
 from typing import Optional, Any, Tuple, Dict, Union
 
-import type_converters
+from config import type_converters
 
 
 class INIWorker:
@@ -33,6 +34,7 @@ class INIWorker:
                 self.config_parser.read_file(f)
         except FileNotFoundError:
             if default_contents is not None:
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
                 self.load_from_string(default_contents)
                 with open(file_path, "w") as f:
                     f.write(default_contents)

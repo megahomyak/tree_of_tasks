@@ -2,9 +2,9 @@ from typing import Tuple, Dict, List, Callable
 
 from sqlalchemy.orm.exc import NoResultFound
 
+from config.ini_worker import MyINIWorker
 from handlers import handler_helpers
 from handlers.handler_helpers import HandlingResult
-from ini_worker import MyINIWorker
 from lexer import lexer_classes
 from orm import models
 from orm.db_apis import TasksManager

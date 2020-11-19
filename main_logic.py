@@ -2,9 +2,9 @@ import functools
 from configparser import ConfigParser
 from typing import NoReturn, Dict, List, Callable
 
+from config.ini_worker import MyINIWorker
 from handlers.handler_helpers import BooleanTaskFields, HandlingResult
 from handlers.handlers import Handlers
-from ini_worker import MyINIWorker
 from lexer import (
     arg_implementations, constant_metadata_implementations, lexer_classes,
     exceptions
@@ -303,7 +303,10 @@ class MainLogic:
 
 
 if __name__ == '__main__':
-    ini_worker = MyINIWorker(ConfigParser(), "tree_of_tasks_config.ini")
+    ini_worker = MyINIWorker(
+        ConfigParser(),
+        "config/declarative_config_files/tree_of_tasks_config.ini"
+    )
     main_logic = MainLogic(
         ini_worker,
         Handlers(
